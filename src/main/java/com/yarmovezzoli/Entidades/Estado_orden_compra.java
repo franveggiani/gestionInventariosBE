@@ -1,6 +1,6 @@
-package com.example.demo.entities;
+package com.yarmovezzoli.Entidades;
 
-import com.example.demo.Enums.EstadoOrden;
+import com.yarmovezzoli.Enumeraciones.EstadoOrden;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

@@ -1,4 +1,4 @@
-package com.example.demo.entities;
+package com.yarmovezzoli.Entidades;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;

@@ -1,4 +1,4 @@
-package com.example.demo.entities;
+package com.yarmovezzoli.Entidades;
 
 import java.time.LocalDate;
 import java.util.Date;
