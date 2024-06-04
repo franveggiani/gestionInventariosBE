@@ -1,4 +1,4 @@
-package com.yarmovezzoli.Enumeraciones;
+package com.yarmovezzoli.gestioninv.Enums;
 
 public enum EstadoOrden {
     PENDIENTE,

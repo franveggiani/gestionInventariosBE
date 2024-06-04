@@ -1,4 +1,4 @@
-package com.yarmovezzoli.Entidades;
+package com.yarmovezzoli.gestioninv.Entities;
 
 import java.time.LocalDate;
 import java.util.Date;

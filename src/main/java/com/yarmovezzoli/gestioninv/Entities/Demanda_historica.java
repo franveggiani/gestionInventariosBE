@@ -1,4 +1,4 @@
-package com.yarmovezzoli.Entidades;
+package com.yarmovezzoli.gestioninv.Entities;
 
 import jakarta.persistence.*;
 import lombok.*;

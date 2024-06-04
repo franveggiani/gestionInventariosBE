@@ -1,6 +1,5 @@
-package com.yarmovezzoli.Entidades;
+package com.yarmovezzoli.gestioninv.Entities;
 
-import com.yarmovezzoli.Enumeraciones.EstadoOrden;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -8,6 +7,8 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.util.List;
+
+import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
 
 @Entity
 @Table(name = "estado_orden_compra")
