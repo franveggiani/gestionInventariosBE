@@ -58,6 +58,6 @@ public class Articulo extends Base{
     @OneToMany(mappedBy = "articuloId")
     private List<DemandaHistoricaDetalle> demandaHistoricaDetalles;
 
-    @OneToMany(mappedBy = "articuloId")
+    @OneToMany(mappedBy = "articulo")
     private List<Venta> ventas;
 }
