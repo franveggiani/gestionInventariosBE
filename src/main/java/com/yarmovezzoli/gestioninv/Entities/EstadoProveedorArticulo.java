@@ -16,10 +16,10 @@ import java.util.List;
 @Getter
 @Setter
 
-public class Estado_proveedor_articulo extends Base{
+public class EstadoProveedorArticulo extends Base{
     @Column(name = "nombre_estado")
-    private String nombre_estado;
+    private String nombreEstado;
 
-    @OneToMany(mappedBy = "actual", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Proveedor_articulo> proveedor_articulos = new ArrayList<>();
+    @OneToMany(mappedBy = "estadoActual", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProveedorArticulo> proveedorArticulos = new ArrayList<>();
 }

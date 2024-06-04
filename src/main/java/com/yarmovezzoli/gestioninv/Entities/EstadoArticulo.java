@@ -10,18 +10,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "modelo_inventario")
+@Table(name = "estado_articulo")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
+public class EstadoArticulo extends Base{
+    @Column (name = "fecha_hora_alta_estado")
+    private LocalDate fechaHoraAltaEstado;
 
-public class Modelo_inventario extends Base{
-    @Column(name = "nombre")
-    private String nombre;
+    @Column(name = "nombre_estado")
+    private int nombreEstado; // VER SI NO HACER UN ENUM
 
-    @OneToMany(mappedBy = "modeloInventario")
-    private List<Articulo> m_articulos;
+    @OneToMany(mappedBy = "estadoArticulo")
+    private List<Articulo> estadoArticulo;
 }

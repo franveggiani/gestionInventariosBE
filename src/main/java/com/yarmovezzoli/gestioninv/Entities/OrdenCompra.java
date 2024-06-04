@@ -13,18 +13,18 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class Orden_compra extends Base{
+public class OrdenCompra extends Base{
     @Column(name = "cantidad")
     private int cantidad;
 
     @Column(name = "demora_estimada")
-    private int demora_estimada;
+    private int demoraEstimada;
 
     @Column(name = "fecha_hora_alta")
-    private  int fecha_hora_alta;
+    private int fechaHoraAlta;
 
     @Column(name = "nro_orden_compra")
-    private  int nro_orden_compra;
+    private int nroOrdenCompra;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proveedor_id")
@@ -32,9 +32,9 @@ public class Orden_compra extends Base{
 
     @ManyToOne
     @JoinColumn(name = "estado_orden_compra_id")
-    private Estado_orden_compra estado_orden_compra;
+    private EstadoOrdenCompra estadoOrdenCompra;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
-    private Articulo oc_articulo;
+    private Articulo articuloId;
 }

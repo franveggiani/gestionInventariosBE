@@ -1,6 +1,10 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,15 +17,15 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class Demanda_historica_detalle extends Base{
+public class DemandaHistoricaDetalle extends Base{
     @Column(name = "cantidad")
     private int cantidad;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
-    private Articulo dhd_articulo;
+    private Articulo articuloId;
 
     @ManyToOne
     @JoinColumn(name = "demanda_historica_id")
-    private Demanda_historica demandaHistorica;
+    private DemandaHistorica demandaHistorica;
 }

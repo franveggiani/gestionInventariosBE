@@ -2,32 +2,28 @@ package com.yarmovezzoli.gestioninv.Entities;
 
 import java.time.LocalDate;
 import java.util.Date;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Data
 @Table(name = "venta")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 
-public class Venta {
+public class Venta extends Base{
 
     @Column (name = "cantidad")
     private int cantidad;
 
     @Column (name = "fyh_alta")
-    private Date fyh_alta;
+    private LocalDate fechaHoraAlta;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
-    private Articulo v_articulo;
+    private Articulo articuloId;
 }

@@ -1,8 +1,12 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -12,20 +16,20 @@ import java.util.List;
 @Getter
 @Setter
 
-public class Demanda_historica extends Base{
+public class DemandaHistorica extends Base{
     @Column(name = "cantidad_total")
-    private int cantidad_total;
+    private int cantidadTotal;
 
     @Column(name = "fecha_desde")
-    private Data fecha_desde;
+    private LocalDate fechaDesde;
 
     @Column(name = "fecha_hasta")
-    private Data fecha_hasta;
+    private LocalDate fechaHasta;
 
     @OneToMany(mappedBy = "demandaHistorica")
-    private List<Demanda_historica_detalle> detallesDemandaHistorica;
+    private List<DemandaHistoricaDetalle> demandaHistoricaDetalles;
 
     @ManyToOne
     @JoinColumn(name = "tipo_periodo_id")
-    private Tipo_periodo tipoPeriodo;
+    private TipoPeriodo tipoPeriodo;
 }

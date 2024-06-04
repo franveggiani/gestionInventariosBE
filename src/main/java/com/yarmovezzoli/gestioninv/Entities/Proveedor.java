@@ -12,7 +12,6 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
-@Data
 
 public class Proveedor extends Base{
     @Column(name = "fecha_hora_baja")
@@ -22,9 +21,9 @@ public class Proveedor extends Base{
     private String nombre;
 
     @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL)
-    private List<Proveedor_articulo> p_articulo;
+    private List<ProveedorArticulo> proveedorArticulo;
 
     @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL)
-    private List<Orden_compra> ordenesCompra;
+    private List<OrdenCompra> ordenesCompra;
 
 }

@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.util.List;
+import java.time.LocalDate;
 
 import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
 
@@ -15,17 +16,16 @@ import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-@Data
 @Setter
 
-public class Estado_orden_compra extends Base{
+public class EstadoOrdenCompra extends Base{
 
     @Column (name = "fecha_hora_baja")
-    private Data fecha_hora_baja;
+    private LocalDate fechaHoraBaja;
 
-    @Column(name = "nombbre_estado")
-    private EstadoOrden nombre_estado;
+    @Column(name = "nombre_estado")
+    private EstadoOrden nombreEstado;
 
-    @OneToMany(mappedBy = "estado_orden_compra")
-    private List<Orden_compra> ordenesCompra;
+    @OneToMany(mappedBy = "estadoOrdenCompra")
+    private List<OrdenCompra> ordenesCompra;
 }
