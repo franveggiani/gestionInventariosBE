@@ -1,8 +1,6 @@
 package com.yarmovezzoli.Entidades;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
+
 public class Orden_compra extends Base{
     @Column(name = "cantidad")
     private int cantidad;
@@ -26,4 +25,16 @@ public class Orden_compra extends Base{
 
     @Column(name = "nro_orden_compra")
     private  int nro_orden_compra;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proveedor_id")
+    private Proveedor proveedor;
+
+    @ManyToOne
+    @JoinColumn(name = "estado_orden_compra_id")
+    private Estado_orden_compra estado_orden_compra;
+
+    @ManyToOne
+    @JoinColumn(name = "articulo_id")
+    private Articulo oc_articulo;
 }

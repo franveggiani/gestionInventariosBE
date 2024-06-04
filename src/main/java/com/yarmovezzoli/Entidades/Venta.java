@@ -26,4 +26,8 @@ public class Venta {
 
     @Column (name = "fyh_alta")
     private Date fyh_alta;
+
+    @ManyToOne
+    @JoinColumn(name = "articulo_id")
+    private Articulo v_articulo;
 }

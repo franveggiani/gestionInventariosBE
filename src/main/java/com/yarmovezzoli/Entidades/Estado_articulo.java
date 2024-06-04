@@ -2,8 +2,11 @@ package com.yarmovezzoli.Entidades;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.*;
+
+import java.util.List;
 
 @Entity
 @Table(name = "estado_articulo")
@@ -20,4 +23,6 @@ public class Estado_articulo extends Base{
     @Column(name = "nombre_estado")
     private int nombre_estado; // VER SI NO HACER UN ENUM
 
+    @OneToMany(mappedBy = "estadoArticulo")
+    private List<Articulo> e_articulos;
 }

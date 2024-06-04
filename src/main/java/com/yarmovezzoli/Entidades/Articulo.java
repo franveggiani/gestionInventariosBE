@@ -1,12 +1,12 @@
 package com.yarmovezzoli.Entidades;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "articulo")
@@ -40,4 +40,24 @@ public class Articulo extends Base{
 
     @Column(name = "tiempo_entre_pedidos")
     private int tiempo_entre_pedidos;
+
+    @ManyToOne
+    @JoinColumn(name = "modelo_inventario_id")
+    private Modelo_inventario modeloInventario;
+
+    @ManyToOne
+    @JoinColumn(name = "estado_articulo_id")
+    private Estado_articulo estadoArticulo;
+
+    @OneToMany(mappedBy = "articulo")
+    private List<Proveedor_articulo> proveedorArticulos;
+
+    @OneToMany(mappedBy = "articulo")
+    private List<Orden_compra> ordenesCompra;
+
+    @OneToMany(mappedBy = "articulo")
+    private List<Demanda_historica_detalle> demandaHistoricaDetalles;
+
+    @OneToMany(mappedBy = "articulo")
+    private List<Venta> ventas;
 }

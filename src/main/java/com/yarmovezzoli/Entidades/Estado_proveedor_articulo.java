@@ -1,12 +1,13 @@
 package com.yarmovezzoli.Entidades;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "estadoprovart")
@@ -18,4 +19,7 @@ import lombok.Setter;
 public class Estado_proveedor_articulo extends Base{
     @Column(name = "nombre_estado")
     private String nombre_estado;
+
+    @OneToMany(mappedBy = "actual", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Proveedor_articulo> proveedor_articulos = new ArrayList<>();
 }
