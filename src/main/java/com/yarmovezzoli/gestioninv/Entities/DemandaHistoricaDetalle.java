@@ -23,9 +23,9 @@ public class DemandaHistoricaDetalle extends Base{
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
-    private Articulo articuloId;
+    private Articulo articulo;
 
-    @ManyToOne
-    @JoinColumn(name = "demanda_historica_id")
-    private DemandaHistorica demandaHistorica;
+//    @ManyToOne
+//    @JoinColumn(name = "demanda_historica_id")
+//    private DemandaHistorica demandaHistorica;
 }

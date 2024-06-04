@@ -26,7 +26,7 @@ public class DemandaHistorica extends Base{
     @Column(name = "fecha_hasta")
     private LocalDate fechaHasta;
 
-    @OneToMany(mappedBy = "demandaHistorica")
+    @OneToMany
     private List<DemandaHistoricaDetalle> demandaHistoricaDetalles;
 
     @ManyToOne

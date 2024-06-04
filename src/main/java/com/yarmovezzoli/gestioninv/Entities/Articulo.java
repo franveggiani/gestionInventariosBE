@@ -52,12 +52,12 @@ public class Articulo extends Base{
     @OneToMany(mappedBy = "articuloId")
     private List<ProveedorArticulo> proveedorArticulos;
 
-    @OneToMany(mappedBy = "articuloId")
-    private List<OrdenCompra> ordenesCompra;
-
-    @OneToMany(mappedBy = "articuloId")
-    private List<DemandaHistoricaDetalle> demandaHistoricaDetalles;
-
-    @OneToMany(mappedBy = "articulo")
-    private List<Venta> ventas;
+//    @OneToMany(mappedBy = "articuloId")
+//    private List<OrdenCompra> ordenesCompra;
+//
+//    @OneToMany(mappedBy = "articulo")
+//    private List<DemandaHistoricaDetalle> demandaHistoricaDetalles;
+//
+//    @OneToMany(mappedBy = "articulo")
+//    private List<Venta> ventas;
 }
