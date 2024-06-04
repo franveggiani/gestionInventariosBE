@@ -18,46 +18,46 @@ import java.util.List;
 public class Articulo extends Base{
 
     @Column(name = "costo_almacenamiento")
-    private float costo_almacenamiento;
+    private float costoAlmacenamiento;
 
     @Column(name = "costo_orden")
-    private float costo_orden;
+    private float costoOrden;
 
     @Column(name = "lote_optimo")
-    private int lote_optimo;
+    private int loteOptimo;
 
     @Column(name = "nombre")
     private String nombre;
 
     @Column(name = "punto_pedido")
-    private int punto_pedido;
+    private int puntoPedido;
 
     @Column(name = "stock_actual")
-    private int stock_actual;
+    private int stockActual;
 
     @Column(name = "stock_seguridad")
-    private int stock_seguridad;
+    private int stockSeguridad;
 
     @Column(name = "tiempo_entre_pedidos")
-    private int tiempo_entre_pedidos;
+    private int tiempoEntrePedidos;
 
     @ManyToOne
     @JoinColumn(name = "modelo_inventario_id")
-    private Modelo_inventario modeloInventario;
+    private ModeloInventario modeloInventario;
 
     @ManyToOne
     @JoinColumn(name = "estado_articulo_id")
-    private Estado_articulo estadoArticulo;
+    private EstadoArticulo estadoArticulo;
 
-    @OneToMany(mappedBy = "articulo")
-    private List<Proveedor_articulo> proveedorArticulos;
+    @OneToMany(mappedBy = "articuloId")
+    private List<ProveedorArticulo> proveedorArticulos;
 
-    @OneToMany(mappedBy = "articulo")
-    private List<Orden_compra> ordenesCompra;
+    @OneToMany(mappedBy = "articuloId")
+    private List<OrdenCompra> ordenesCompra;
 
-    @OneToMany(mappedBy = "articulo")
-    private List<Demanda_historica_detalle> demandaHistoricaDetalles;
+    @OneToMany(mappedBy = "articuloId")
+    private List<DemandaHistoricaDetalle> demandaHistoricaDetalles;
 
-    @OneToMany(mappedBy = "articulo")
+    @OneToMany(mappedBy = "articuloId")
     private List<Venta> ventas;
 }
