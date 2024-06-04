@@ -1,5 +1,6 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
+import java.time.LocalDate;
 import java.util.Date;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
