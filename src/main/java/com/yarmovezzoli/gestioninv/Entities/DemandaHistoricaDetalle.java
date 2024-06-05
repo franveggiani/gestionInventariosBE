@@ -17,15 +17,17 @@ import lombok.Setter;
 @Getter
 @Setter
 
-public class DemandaHistoricaDetalle extends Base{
+public class DemandaHistoricaDetalle extends Base {
     @Column(name = "cantidad")
     private int cantidad;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
     private Articulo articuloId;
-
+/*
     @ManyToOne
     @JoinColumn(name = "demanda_historica_id")
     private DemandaHistorica demandaHistorica;
+
+ */
 }

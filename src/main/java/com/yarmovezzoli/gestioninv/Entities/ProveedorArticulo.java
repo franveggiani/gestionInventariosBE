@@ -21,11 +21,12 @@ public class ProveedorArticulo extends Base{
     @JoinColumn(name = "estado_proveedor_articulo_id")
     private EstadoProveedorArticulo estadoActual;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proveedor_id")
-    private Proveedor proveedor;
-
     @ManyToOne
     @JoinColumn(name = "articulo_id")
     private Articulo articuloId;
+
+     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "proveedor_id")
+    private Proveedor proveedor;
+
 }

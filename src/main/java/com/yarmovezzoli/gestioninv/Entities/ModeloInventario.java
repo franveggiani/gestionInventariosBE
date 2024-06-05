@@ -21,7 +21,8 @@ import java.util.List;
 public class ModeloInventario extends Base{
     @Column(name = "nombre")
     private String nombre;
-
+/*
     @OneToMany(mappedBy = "modeloInventario")
     private List<Articulo> mmodeloArticulo;
+*/
 }
