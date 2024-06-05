@@ -24,7 +24,9 @@ public class EstadoArticulo extends Base{
 
     @Column(name = "nombre_estado")
     private int nombreEstado; // VER SI NO HACER UN ENUM
-
+/*
     @OneToMany(mappedBy = "estadoArticulo")
     private List<Articulo> estadoArticulo;
+
+ */
 }

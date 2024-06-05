@@ -24,7 +24,9 @@ public class TipoPeriodo extends Base{
 
     @Column(name= "nombre_tipo")
     private String nombreTipo; //VER SI NO ES UNA EUNUM
-
+/*
     @OneToMany(mappedBy = "tipoPeriodo")
     private List<DemandaHistorica> demandasHistoricas;
+ */
+
 }
