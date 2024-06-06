@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDate;
+import java.time.Month;
+import java.util.Random;
 
 @SpringBootApplication
 public class GestioninvApplication {
@@ -47,16 +49,27 @@ public class GestioninvApplication {
 			articuloRepository.save(articulo2);
 			articuloRepository.save(articulo3);
 
-			//Para probar la demanda histórica
-			for (int i = 0; i < 30; i++) {
-				Venta venta = new Venta();
-				venta.setId(Long.valueOf(i));
-				venta.setCantidad(100+i);
-				venta.setArticulo(articulo1);
-				venta.setFechaHoraAlta(LocalDate.of(2023, 8, i+1));
+			Random random = new Random();
 
-				ventaRepository.save(venta);
+			Long id = 0L;
+			for (int i = 0; i < 12; i++) {
+
+				int daysInMonth = Month.of(i + 1).length(false); // false means non-leap year
+
+				for (int j = 0; j < daysInMonth; j++) {
+					id += 1;
+
+					Venta venta = new Venta();
+					venta.setId(id);
+					venta.setCantidad(random.nextInt(100));
+					venta.setArticulo(articulo1);
+
+					venta.setFechaHoraAlta(LocalDate.of(2023, i + 1, j + 1));
+					ventaRepository.save(venta);
+				}
 			}
+
+			//Para probar la demanda histórica
 
 		};
 	}
