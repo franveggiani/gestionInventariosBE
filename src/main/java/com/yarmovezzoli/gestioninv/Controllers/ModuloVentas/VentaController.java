@@ -24,7 +24,7 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
     }
 
     //Desarrollar demanda historica en el Service
-    @GetMapping("createDemandaHistorica")
+    @PostMapping("createDemandaHistorica")
     public ResponseEntity<?> createDemandaHistorica(@RequestBody DemandaHistoricaRequest demandaHistoricaRequest){
         try {
             return ResponseEntity.status(HttpStatus.OK).body(service.createDemandaHistorica(demandaHistoricaRequest));

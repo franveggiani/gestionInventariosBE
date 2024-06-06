@@ -42,22 +42,11 @@ public class Articulo extends Base{
     private int tiempoEntrePedidos;
 
     @ManyToOne
-    @JoinColumn(name = "modelo_inventario_id")
-    private ModeloInventario modeloInventario;
-
-    @ManyToOne
     @JoinColumn(name = "estado_articulo_id")
     private EstadoArticulo estadoArticulo;
 
-    @OneToMany(mappedBy = "articuloId")
-    private List<ProveedorArticulo> proveedorArticulos;
+    @ManyToOne
+    @JoinColumn(name = "modelo_inventario_id")
+    private ModeloInventario modeloInventario;
 
-//    @OneToMany(mappedBy = "articuloId")
-//    private List<OrdenCompra> ordenesCompra;
-//
-//    @OneToMany(mappedBy = "articulo")
-//    private List<DemandaHistoricaDetalle> demandaHistoricaDetalles;
-//
-//    @OneToMany(mappedBy = "articulo")
-//    private List<Venta> ventas;
 }

@@ -1,5 +1,6 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
+import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -13,7 +14,7 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "demanda_historica_detalle")
+@Table(name = "demanda_historica")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -33,5 +34,8 @@ public class DemandaHistorica extends Base{
 
     @Column(name = "fechaHasta")
     private LocalDate fechaHasta;
+
+    @Column(name = "tipoPeriodo")
+    private String tipoPeriodo;
 
 }

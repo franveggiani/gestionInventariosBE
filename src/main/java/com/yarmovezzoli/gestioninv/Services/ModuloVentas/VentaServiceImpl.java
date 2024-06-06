@@ -8,6 +8,7 @@ import com.yarmovezzoli.gestioninv.Entities.Venta;
 import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.BaseRepository;
+import com.yarmovezzoli.gestioninv.Repositories.DemandaHistoricaRepository;
 import com.yarmovezzoli.gestioninv.Repositories.VentaRepository;
 import com.yarmovezzoli.gestioninv.Services.BaseServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,14 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     VentaRepository ventaRepository;
     @Autowired
     ArticuloRepository articuloRepository;
+    @Autowired
+    DemandaHistoricaRepository demandaHistoricaRepository;
 
-    public VentaServiceImpl(BaseRepository<Venta, Long> baseRepository, VentaRepository ventaRepository, ArticuloRepository articuloRepository){
+    public VentaServiceImpl(BaseRepository<Venta, Long> baseRepository, VentaRepository ventaRepository, ArticuloRepository articuloRepository, DemandaHistoricaRepository demandaHistoricaRepository){
         super(baseRepository);
         this.ventaRepository = ventaRepository;
         this.articuloRepository = articuloRepository;
+        this.demandaHistoricaRepository = demandaHistoricaRepository;
     }
 
     @Override
@@ -85,17 +89,17 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                     throw new Exception("Error: No hay ventas registradas para este rango de fechas");
                 }
 
-
                 demandaHistorica.setCantidadTotal(cantidadTotalVentas[0]);
                 demandaHistorica.setFechaDesde(fechaDesde);
                 demandaHistorica.setFechaHasta(fechaHasta);
                 demandaHistorica.setArticulo(articulo.get());
+                demandaHistorica.setTipoPeriodo(tipoPeriodo.name());
 
             } else {
                 throw new Exception("Error: El artículo requerido no ha sido encontrado");
             }
 
-            //Falta guardar en la base de datos pero estoy probando a ver si funca esta lógica
+            demandaHistoricaRepository.save(demandaHistorica);
 
             return demandaHistorica;
 
