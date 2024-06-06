@@ -9,7 +9,7 @@ import java.time.LocalDate;
 public class DemandaHistoricaRequest {
 
     private LocalDate fechaDesde;
-    private LocalDate fechaHasta;
     private TipoPeriodo tipoPeriodo;
+    private Long articuloId;
 
 }

@@ -1,35 +1,37 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
-@Table(name = "demanda_historica")
+@Table(name = "demanda_historica_detalle")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 
 public class DemandaHistorica extends Base{
-    @Column(name = "cantidad_total")
+
+    @Column(name = "cantidadTotal")
     private int cantidadTotal;
 
-    @Column(name = "fecha_desde")
+    @ManyToOne
+    @JoinColumn(name = "articulo_id")
+    private Articulo articulo;
+
+    @Column(name = "fechaDesde")
     private LocalDate fechaDesde;
 
-    @Column(name = "fecha_hasta")
+    @Column(name = "fechaHasta")
     private LocalDate fechaHasta;
 
-    @OneToMany
-    private List<DemandaHistoricaDetalle> demandaHistoricaDetalles;
-
-    @ManyToOne
-    @JoinColumn(name = "tipo_periodo_id")
-    private TipoPeriodo tipoPeriodo;
 }

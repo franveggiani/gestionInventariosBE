@@ -4,7 +4,6 @@ import com.yarmovezzoli.gestioninv.DTOs.DemandaHistoricaRequest;
 import com.yarmovezzoli.gestioninv.DTOs.VentaRequestDTO;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.DemandaHistorica;
-import com.yarmovezzoli.gestioninv.Entities.DemandaHistoricaDetalle;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
 import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
@@ -62,38 +61,38 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     @Override
     public DemandaHistorica createDemandaHistorica(DemandaHistoricaRequest demandaHistoricaRequest) throws Exception {
         try{
-            TipoPeriodo tipoPeriodo;
-            tipoPeriodo = demandaHistoricaRequest.getTipoPeriodo();
-
-            //Si es Semestral serán 183 días, si es Trimestral serán 91 días, y así...
-            Long cantidadDias = tipoPeriodo.getDias();
-
-            LocalDate fechaDesde = demandaHistoricaRequest.getFechaDesde();
-            LocalDate fechaHasta = demandaHistoricaRequest.getFechaDesde().plusDays(cantidadDias);
 
             DemandaHistorica demandaHistorica = new DemandaHistorica();
+            Optional<Articulo> articulo = articuloRepository.findById(demandaHistoricaRequest.getArticuloId());
 
-            demandaHistorica.setFechaDesde(fechaDesde);
-            demandaHistorica.setFechaHasta(fechaHasta);
+            if (articulo.isPresent()) {
 
-            List<Venta> ventaList = ventaRepository.listaPorPeriodo(fechaDesde, fechaHasta);
+                TipoPeriodo tipoPeriodo = demandaHistoricaRequest.getTipoPeriodo();
+                Long cantidadDias = tipoPeriodo.getDias();                                                  //Si es Semestral serán 183 días, si es Trimestral serán 91 días, y así...
 
-            if (!ventaList.isEmpty()) {
-                List<DemandaHistoricaDetalle> demandaHistoricaDetalleList = new ArrayList<>();
+                LocalDate fechaHasta = demandaHistoricaRequest.getFechaDesde().plusDays(cantidadDias);
+                LocalDate fechaDesde = demandaHistoricaRequest.getFechaDesde();
 
-                ventaList.forEach(venta -> {
-                    DemandaHistoricaDetalle demandaHistoricaDetalle = new DemandaHistoricaDetalle();
+                List<Venta> ventaList = ventaRepository.listaPorPeriodo(fechaDesde, fechaHasta);
 
-                    demandaHistoricaDetalle.setArticulo(venta.getArticulo());
-                    demandaHistoricaDetalle.setCantidad(venta.getCantidad());
+                int[] cantidadTotalVentas = {0};
 
-                    demandaHistoricaDetalleList.add(demandaHistoricaDetalle);
-                });
+                if (!ventaList.isEmpty()) {
+                    ventaList.forEach(venta -> {
+                        cantidadTotalVentas[0] += venta.getCantidad();
+                    });
+                } else {
+                    throw new Exception("Error: No hay ventas registradas para este rango de fechas");
+                }
 
-                demandaHistorica.setDemandaHistoricaDetalles(demandaHistoricaDetalleList);
+
+                demandaHistorica.setCantidadTotal(cantidadTotalVentas[0]);
+                demandaHistorica.setFechaDesde(fechaDesde);
+                demandaHistorica.setFechaHasta(fechaHasta);
+                demandaHistorica.setArticulo(articulo.get());
 
             } else {
-                throw new Exception("Error: No hay ventas registradas para este rango de fechas");
+                throw new Exception("Error: El artículo requerido no ha sido encontrado");
             }
 
             //Falta guardar en la base de datos pero estoy probando a ver si funca esta lógica
