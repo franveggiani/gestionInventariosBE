@@ -23,4 +23,12 @@ public class ProveedorController extends BaseControllerImpl<Proveedor,Proveedore
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
+    @GetMapping("/mostrarproveedores")
+    public ResponseEntity<?> mostrarProveedores(){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.mostrarProveedores());
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }

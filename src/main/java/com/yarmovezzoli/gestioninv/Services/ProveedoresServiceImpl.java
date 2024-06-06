@@ -26,4 +26,14 @@ public class ProveedoresServiceImpl extends BaseServiceImpl<Proveedor,Long> impl
             throw new Exception(e.getMessage());
         }
     }
+    public List<Proveedor> mostrarProveedores() throws  Exception{
+        try {
+
+            List<Proveedor> proveedores = proveedorRepository.findAll();
+            return proveedores;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
 }
