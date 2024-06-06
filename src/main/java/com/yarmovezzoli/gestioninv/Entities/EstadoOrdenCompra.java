@@ -25,7 +25,9 @@ public class EstadoOrdenCompra extends Base{
 
     @Column(name = "nombre_estado")
     private EstadoOrden nombreEstado;
-
+/*
     @OneToMany(mappedBy = "estadoOrdenCompra")
     private List<OrdenCompra> ordenesCompra;
+
+ */
 }
