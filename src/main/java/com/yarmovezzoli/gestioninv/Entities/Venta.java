@@ -20,10 +20,10 @@ public class Venta extends Base{
     @Column (name = "cantidad")
     private int cantidad;
 
-    @Column (name = "fyh_alta")
+    @Column (name = "fecha_hora_alta")
     private LocalDate fechaHoraAlta;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
-    private Articulo articuloId;
+    private Articulo articulo;
 }

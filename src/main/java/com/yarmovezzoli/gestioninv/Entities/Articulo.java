@@ -49,19 +49,4 @@ public class Articulo extends Base{
     @JoinColumn(name = "modelo_inventario_id")
     private ModeloInventario modeloInventario;
 
-    /*
-
-    @OneToMany(mappedBy = "articuloId")
-    private List<ProveedorArticulo> proveedorArticulos;
-
-    @OneToMany(mappedBy = "articuloId")
-    private List<OrdenCompra> ordenesCompra;
-
-    @OneToMany(mappedBy = "articuloId")
-    private List<DemandaHistoricaDetalle> demandaHistoricaDetalles;
-
-    @OneToMany(mappedBy = "articuloId")
-    private List<Venta> ventas;
-
- */
 }
