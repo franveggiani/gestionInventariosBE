@@ -1,5 +1,6 @@
 package com.yarmovezzoli.gestioninv.Controllers;
 
+import com.yarmovezzoli.gestioninv.DTOs.OrdenCompraDTO;
 import com.yarmovezzoli.gestioninv.Entities.OrdenCompra;
 import com.yarmovezzoli.gestioninv.Services.OrdenCompraServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,11 @@ public class OrdenCompraController extends BaseControllerImpl<OrdenCompra, Orden
 
     @Autowired
     OrdenCompraServiceImpl ordenCompraService;
-    @GetMapping("/newOrdenCompra")
-    public ResponseEntity<?> obtenerOrdenesCompraPendientesPorArticulo(@RequestBody Long articuloId){ //@PathVariable
+
+    @PutMapping("/newOrdenCompraV1")
+    public ResponseEntity<?> nuevaOrdenCompraArt(@RequestBody OrdenCompraDTO ordenCompraDTO){
         try{
-            return ResponseEntity.status(HttpStatus.OK).body(service.obtenerOrdenesCompraPendientesPorArticulo(articuloId));
+            return ResponseEntity.status(HttpStatus.OK).body(service.newOrdenCompra(ordenCompraDTO));
         }catch (Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
         }

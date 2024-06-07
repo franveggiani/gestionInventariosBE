@@ -10,15 +10,9 @@ import java.util.List;
 
 @Repository
 public interface OrdenCompraRepository extends BaseRepository<OrdenCompra, Long>{
-
     @Query(value = "SELECT oc FROM OrdenCompra oc WHERE oc.id = :id")
     OrdenCompra buscarPorId(@Param("id") Long id);
+    @Query("SELECT oc FROM OrdenCompra oc ORDER BY oc.nroOrdenCompra DESC")
+    OrdenCompra findTopByOrderByNroOrdenCompraDesc();
 
-    @Query("SELECT oc FROM OrdenCompra oc " +
-            "JOIN oc.estadoOrdenCompra eoc " +
-            "JOIN oc.articuloId a " +
-            "WHERE eoc.nombreEstado = :PENDIENTE " +
-            "AND a.id = :articuloId")
-    List<OrdenCompra> findOrdenesCompraPendientesByArticulo(@Param("articuloId") Long articuloId,
-                                                            @Param("PENDIENTE") EstadoOrden estadoPendiente);
 }

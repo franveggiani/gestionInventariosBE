@@ -1,10 +1,13 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
+import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "orden_compra")
@@ -21,18 +24,17 @@ public class OrdenCompra extends Base{
     private int demoraEstimada;
 
     @Column(name = "fecha_hora_alta")
-    private int fechaHoraAlta;
+    private LocalDate fechaHoraAlta;
 
     @Column(name = "nro_orden_compra")
     private int nroOrdenCompra;
 
+    @Column(name = "nombre_estado")
+    private EstadoOrden nombreEstado;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proveedor_id")
     private Proveedor proveedor;
-
-    @ManyToOne
-    @JoinColumn(name = "estado_orden_compra_id")
-    private EstadoOrdenCompra estadoOrdenCompra;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
