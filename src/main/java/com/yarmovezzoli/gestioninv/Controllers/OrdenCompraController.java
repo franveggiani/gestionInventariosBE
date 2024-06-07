@@ -17,7 +17,7 @@ public class OrdenCompraController extends BaseControllerImpl<OrdenCompra, Orden
     @Autowired
     OrdenCompraServiceImpl ordenCompraService;
 
-    @PutMapping("/newOrdenCompraV1")
+    @PostMapping("")
     public ResponseEntity<?> nuevaOrdenCompraArt(@RequestBody OrdenCompraDTO ordenCompraDTO){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(service.newOrdenCompra(ordenCompraDTO));

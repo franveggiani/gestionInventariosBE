@@ -8,10 +8,6 @@ import lombok.Data;
 public class OrdenCompraDTO {
     int cantidad;
     int demoraEstimada;
-    int fechaHoraAlta;
-    int nroOrdenCompra;
-    Proveedor proveedor;
-    EstadoOrdenCompra estadoOrdenCompra;
-    Articulo articuloId;
-
+    Long proveedorId;
+    Long articuloId;
 }

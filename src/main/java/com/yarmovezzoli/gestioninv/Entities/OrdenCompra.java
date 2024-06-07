@@ -38,5 +38,5 @@ public class OrdenCompra extends Base{
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
-    private Articulo articuloId;
+    private Articulo articulo;
 }
