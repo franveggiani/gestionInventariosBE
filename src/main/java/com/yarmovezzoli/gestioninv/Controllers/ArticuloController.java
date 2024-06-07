@@ -2,7 +2,6 @@ package com.yarmovezzoli.gestioninv.Controllers;
 
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Services.ArticuloServiceImpl;
-import com.yarmovezzoli.gestioninv.Services.ProveedoresServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

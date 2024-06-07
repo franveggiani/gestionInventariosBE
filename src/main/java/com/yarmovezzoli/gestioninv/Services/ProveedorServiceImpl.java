@@ -9,11 +9,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class ProveedoresServiceImpl extends BaseServiceImpl<Proveedor,Long> implements ProveedorService {
+public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implements ProveedorService {
     @Autowired
     private ProveedorRepository proveedorRepository;
 
-    public ProveedoresServiceImpl(BaseRepository<Proveedor, Long> baseRepository) {
+    public ProveedorServiceImpl(BaseRepository<Proveedor, Long> baseRepository) {
         super(baseRepository);
     }
 
