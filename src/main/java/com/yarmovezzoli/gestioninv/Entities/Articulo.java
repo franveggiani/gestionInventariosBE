@@ -49,4 +49,8 @@ public class Articulo extends Base{
     @JoinColumn(name = "modelo_inventario_id")
     private ModeloInventario modeloInventario;
 
+    public void descontarStock(int cantidad){
+        this.stockActual -= cantidad;
+    }
+
 }

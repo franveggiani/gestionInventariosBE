@@ -35,7 +35,8 @@ public class GestioninvApplication {
 
 			Articulo articulo1 = new Articulo();
 			articulo1.setId(Long.valueOf(1L));
-			articulo1.setNombre("Articulo 1");
+			articulo1.setNombre("Palo de escoba");
+			articulo1.setStockActual(34);
 
 			Articulo articulo2 = new Articulo();
 			articulo2.setId(Long.valueOf(2L));

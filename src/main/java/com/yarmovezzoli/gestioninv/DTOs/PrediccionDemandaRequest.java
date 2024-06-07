@@ -14,6 +14,7 @@ public class PrediccionDemandaRequest {
     private LocalDate fechaDesdePrediccion;
     private Long articuloId;
     private TipoPrediccion tipoPrediccion;
+    private int cantidadPredicciones;
 
     //Buscar ventas que coincidan con el articulo proporcionado acá
 

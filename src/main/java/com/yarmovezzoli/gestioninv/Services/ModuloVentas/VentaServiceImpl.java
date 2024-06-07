@@ -51,10 +51,16 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 nuevaVenta.setFechaHoraAlta(ventaRequest.getFechaHoraAlta());
             }
 
-            Optional<Articulo> articulo = articuloRepository.findById(ventaRequest.getArticuloId());
+            Optional<Articulo> articuloOptional = articuloRepository.findById(ventaRequest.getArticuloId());
 
-            if (articulo.isPresent()){
-                nuevaVenta.setArticulo(articulo.get());
+            if (articuloOptional.isPresent()){
+
+                Articulo articulo = articuloOptional.get();
+
+                nuevaVenta.setArticulo(articulo);
+                articulo.descontarStock(ventaRequest.getCantidad());
+
+                articuloRepository.save(articulo);
                 ventaRepository.save(nuevaVenta);
 
                 return nuevaVenta;
@@ -115,51 +121,73 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     }
 
     @Override
-    public double getPrediccionDemanda(PrediccionDemandaRequest prediccionDemandaRequest) throws Exception {
+    public Map<String, Double> getPrediccionDemanda(PrediccionDemandaRequest prediccionDemandaRequest) throws Exception {
         try {
 
-            LocalDate fechaDesdePrediccion = prediccionDemandaRequest.getFechaDesdePrediccion();
+            //Parámetros iniciales
+            int cantidadPredicciones = prediccionDemandaRequest.getCantidadPredicciones();
             int numeroPeriodos = prediccionDemandaRequest.getNumeroPeriodos();
-            TipoPeriodo tipoPeriodo = prediccionDemandaRequest.getTipoPeriodo();
             Long idArticulo = prediccionDemandaRequest.getArticuloId();
+            TipoPeriodo tipoPeriodo = prediccionDemandaRequest.getTipoPeriodo();
             TipoPrediccion tipoPrediccion = prediccionDemandaRequest.getTipoPrediccion();
+            LocalDate fechaDesdePrediccion = prediccionDemandaRequest.getFechaDesdePrediccion();
 
-            LocalDate comienzoDH = fechaDesdePrediccion.minusDays(tipoPeriodo.getDias()*numeroPeriodos);    //30días * 3periodos = 90 días atrás (si es mensual)
-            //System.out.println(comienzoDH);
-
-            List<DemandaHistorica> demandaHistoricaList = new ArrayList<>();
-            Long cantDiasAgregados = tipoPeriodo.getDias();
-
-            for (int i = 0; i < numeroPeriodos; i++) {
-
-                DemandaHistoricaRequest demandaHistoricaRequest = new DemandaHistoricaRequest();
-
-                demandaHistoricaRequest.setArticuloId(idArticulo);
-                demandaHistoricaRequest.setFechaDesde(comienzoDH);
-                demandaHistoricaRequest.setTipoPeriodo(tipoPeriodo);
-
-                DemandaHistorica demandaHistorica = createDemandaHistorica(demandaHistoricaRequest);
-
-                demandaHistoricaList.add(demandaHistorica);
-
-                //System.out.println("ComienzoDH anterior del bucle" + i + ": " + comienzoDH);
-
-                comienzoDH = comienzoDH.plusDays(cantDiasAgregados);
-
-                //System.out.println("ComienzoDH posterior del bucle" + i + ": " + comienzoDH);
-
-            }
-
-            Map<String, Object> parametros = new HashMap<>();
-
-            parametros.put("demandaHistoricaList", demandaHistoricaList);
-
+            //Creo instancia para calcular la predicción según el tipo
             PrediccionDemandaFactory prediccionDemandaFactory = PrediccionDemandaFactory.getInstance();
             PrediccionDemandaStrategy prediccionDemandaStrategy = prediccionDemandaFactory.getPrediccionDemandaStrategy(tipoPrediccion);
 
-            double promedioMovil = prediccionDemandaStrategy.predecirDemanda(parametros);
+            //Parámetros que voy a pasar para calcular la predicción
+            Map<String, Object> parametros = new HashMap<>();
 
-            return promedioMovil;
+            //Calculo cuánto tiempo voy a retroceder para comenzar a sacar la DH
+            LocalDate comienzoDH = fechaDesdePrediccion.minusDays(tipoPeriodo.getDias()*numeroPeriodos);    //30días * 3periodos = 90 días atrás (si es mensual)
+
+            //Cuántos días voy a agregar a la fecha para recorrer periodos
+            Long cantDiasAgregados = tipoPeriodo.getDias();
+
+            List<Double> listaCantidades = new ArrayList<>();
+            Map<String, Double> listaPredicciones = new HashMap<>();
+
+            for (int i = 0; i < cantidadPredicciones; i++) {
+
+                //En la primera corrida se van a crear los históricos de demanda necesarios
+                if (i == 0){
+                    for (int j = 0; j < numeroPeriodos; j++) {
+                        DemandaHistoricaRequest demandaHistoricaRequest = new DemandaHistoricaRequest();
+
+                        demandaHistoricaRequest.setArticuloId(idArticulo);
+                        demandaHistoricaRequest.setFechaDesde(comienzoDH);
+                        demandaHistoricaRequest.setTipoPeriodo(tipoPeriodo);
+
+                        DemandaHistorica demandaHistorica = createDemandaHistorica(demandaHistoricaRequest);
+                        demandaHistoricaRepository.save(demandaHistorica);
+
+                        comienzoDH = comienzoDH.plusDays(cantDiasAgregados);
+
+                        listaCantidades.add(Double.valueOf(demandaHistorica.getCantidadTotal()));
+                    }
+
+                    parametros.put("arregloCantidades", listaCantidades);
+                    listaPredicciones.put(fechaDesdePrediccion.getMonth().name(), prediccionDemandaStrategy.predecirDemanda(parametros));
+
+                } else {
+
+                    //Elimino primer elemento y agrego el último que va a ser la última predicción
+                    listaCantidades.removeFirst();
+                    listaCantidades.addLast(listaPredicciones.get(fechaDesdePrediccion.getMonth().name()));
+
+                    parametros.put("arregloCantidades", listaCantidades);
+
+                    //Nueva fecha de predicción
+                    fechaDesdePrediccion = fechaDesdePrediccion.plusDays(fechaDesdePrediccion.getMonth().length(false));
+
+                    listaPredicciones.put(fechaDesdePrediccion.getMonth().name(), prediccionDemandaStrategy.predecirDemanda(parametros));
+
+                }
+
+            }
+            
+            return listaPredicciones;
 
         } catch (Exception e){
             throw new Exception(e.getMessage());
