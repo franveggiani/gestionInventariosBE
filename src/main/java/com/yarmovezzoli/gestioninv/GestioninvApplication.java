@@ -1,8 +1,10 @@
 package com.yarmovezzoli.gestioninv;
 
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
+import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
+import com.yarmovezzoli.gestioninv.Repositories.ProveedorRepository;
 import com.yarmovezzoli.gestioninv.Repositories.VentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -23,15 +25,24 @@ public class GestioninvApplication {
 	@Autowired
 	VentaRepository ventaRepository;
 
+	@Autowired
+	ProveedorRepository proveedorRepository;
+
+
 	public static void main(String[] args) {
 		SpringApplication.run(GestioninvApplication.class, args);
 	}
 
 	@Bean
 	public CommandLineRunner init(){
+
 		return args -> {
 
 			System.out.println("Corriendo aplicación...");
+
+			Proveedor proveedor1 = new Proveedor();
+			proveedor1.setNombre("Federico");
+			proveedorRepository.save(proveedor1);
 
 			Articulo articulo1 = new Articulo();
 			articulo1.setId(Long.valueOf(1L));

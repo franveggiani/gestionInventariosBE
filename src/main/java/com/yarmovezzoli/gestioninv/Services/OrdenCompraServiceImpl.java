@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static com.yarmovezzoli.gestioninv.Enums.EstadoOrden.PENDIENTE;
@@ -32,13 +33,30 @@ public class OrdenCompraServiceImpl extends BaseServiceImpl<OrdenCompra,Long> im
     }
 
     @Override
+    public List<OrdenCompra> mostrarOrdenesCompra () throws Exception{
+        try {
+            List<OrdenCompra> ordenCompras = ordencompraRepository.findAll();
+            return ordenCompras;
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+    @Override
     public OrdenCompra newOrdenCompra(OrdenCompraDTO ordenCompraDTO) throws Exception {
 
-        OrdenCompra ultimaOrdenCompra = ordencompraRepository.findTopByOrderByNroOrdenCompraDesc();
-        int nummasaltoOC = ultimaOrdenCompra.getNroOrdenCompra();
 
+        Optional<OrdenCompra> ultimaOrdenCompra = ordencompraRepository.findTopByOrderByNroOrdenCompraDesc();
         OrdenCompra ordenCompra = new OrdenCompra();
-        ordenCompra.setNroOrdenCompra(nummasaltoOC+1);
+
+        if (ultimaOrdenCompra.isEmpty()){
+            ordenCompra.setNroOrdenCompra(0);
+        }
+
+        else {
+            int nummasaltoOC = ultimaOrdenCompra.get().getNroOrdenCompra();
+            ordenCompra.setNroOrdenCompra(nummasaltoOC+1);
+        }
+
         ordenCompra.setCantidad(ordenCompraDTO.getCantidad());
         ordenCompra.setDemoraEstimada(ordenCompraDTO.getDemoraEstimada());
         ordenCompra.setFechaHoraAlta(LocalDate.now());
@@ -47,7 +65,6 @@ public class OrdenCompraServiceImpl extends BaseServiceImpl<OrdenCompra,Long> im
 
             Proveedor proveedor = p1.get();
             ordenCompra.setProveedor(proveedor);
-
 
         Optional<Articulo> a1 =  articuloRepository.findById(ordenCompraDTO.getArticuloId());
 
