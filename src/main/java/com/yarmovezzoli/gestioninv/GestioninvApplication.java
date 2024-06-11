@@ -46,15 +46,18 @@ public class GestioninvApplication {
 
 			Articulo articulo1 = new Articulo();
 			articulo1.setId(Long.valueOf(1L));
-			articulo1.setNombre("Articulo 1");
+			articulo1.setNombre("Palo de escoba");
+			articulo1.setStockActual(34);
 
 			Articulo articulo2 = new Articulo();
 			articulo2.setId(Long.valueOf(2L));
-			articulo2.setNombre("Articulo 2");
+			articulo2.setNombre("Tractor Challenger MT875E");
+			articulo2.setStockActual(100);
 
 			Articulo articulo3 = new Articulo();
-			articulo2.setId(Long.valueOf(3L));
-			articulo2.setNombre("Articulo 2");
+			articulo3.setId(Long.valueOf(3L));
+			articulo3.setNombre("Coche Alfa Romeo 148 2012");
+			articulo3.setStockActual(10);
 
 			articuloRepository.save(articulo1);
 			articuloRepository.save(articulo2);

@@ -23,7 +23,7 @@ public class ProveedorArticulo extends Base{
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
-    private Articulo articuloId;
+    private Articulo articulo;
 
     @ManyToOne(fetch = FetchType.LAZY)       //LO METI DE NUEVO, CAMBIE LA NAVEGABILIDAD
     @JoinColumn(name = "proveedor_id")

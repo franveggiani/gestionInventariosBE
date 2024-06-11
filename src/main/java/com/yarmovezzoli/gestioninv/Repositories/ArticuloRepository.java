@@ -1,10 +1,12 @@
 package com.yarmovezzoli.gestioninv.Repositories;
 
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
+import com.yarmovezzoli.gestioninv.Entities.ModeloInventario;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ArticuloRepository extends BaseRepository<Articulo, Long> {
     @Query(
