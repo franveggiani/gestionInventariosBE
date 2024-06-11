@@ -1,5 +1,7 @@
-package com.yarmovezzoli.gestioninv.Controllers;
+package com.yarmovezzoli.gestioninv.Controllers.ModuloArticulos;
 
+import com.yarmovezzoli.gestioninv.Controllers.BaseControllerImpl;
+import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorRequest;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Services.ProveedoresServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 @RequestMapping(path = "api/v1/proveedores")
 
-public class ProveedorController extends BaseControllerImpl<Proveedor,ProveedoresServiceImpl>{
+public class ProveedorController extends BaseControllerImpl<Proveedor,ProveedoresServiceImpl> {
 
     @Autowired
     ProveedoresServiceImpl proveedoresService;
@@ -20,6 +22,15 @@ public class ProveedorController extends BaseControllerImpl<Proveedor,Proveedore
         try{
             return ResponseEntity.status(HttpStatus.OK).body(service.buscarPorNombre(filtroNombre));
         }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
+
+    @PostMapping("/crear")
+    public ResponseEntity<?> crearProveedor(@RequestBody CrearProveedorRequest crearProveedorRequest){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(service.crearProveedor(crearProveedorRequest));
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }

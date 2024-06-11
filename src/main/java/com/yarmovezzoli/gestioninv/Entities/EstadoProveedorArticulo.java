@@ -19,8 +19,4 @@ import java.util.List;
 public class EstadoProveedorArticulo extends Base{
     @Column(name = "nombre_estado")
     private String nombreEstado;
-/*
-    @OneToMany(mappedBy = "estadoActual", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProveedorArticulo> proveedorArticulos = new ArrayList<>();
- */
 }
