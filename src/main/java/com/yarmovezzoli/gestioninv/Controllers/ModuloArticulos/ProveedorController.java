@@ -45,7 +45,7 @@ public class ProveedorController extends BaseControllerImpl<Proveedor, Proveedor
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
-}
+
     @PostMapping("/crear")
     public ResponseEntity<?> crearProveedor(@RequestBody CrearProveedorRequest crearProveedorRequest){
         try{

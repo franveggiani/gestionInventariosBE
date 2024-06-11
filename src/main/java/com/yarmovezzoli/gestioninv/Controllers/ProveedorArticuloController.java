@@ -1,5 +1,6 @@
 package com.yarmovezzoli.gestioninv.Controllers;
 
+import com.yarmovezzoli.gestioninv.Controllers.ModuloArticulos.ProveedorController;
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorArticuloDTO;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorArticuloDTO;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorDTO;

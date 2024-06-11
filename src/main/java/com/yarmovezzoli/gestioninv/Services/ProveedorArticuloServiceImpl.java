@@ -42,7 +42,7 @@ public class ProveedorArticuloServiceImpl extends BaseServiceImpl<ProveedorArtic
         }
         Proveedor proveedor = proveedorOptional.get();
 
-        proveedorArticulo.setArticuloId(articulo);
+        proveedorArticulo.setArticulo(articulo);
         proveedorArticulo.setDemoraPromedio(crearProveedorArticuloDTO.getDemora());
         proveedorArticulo.setProveedor(proveedor);
 
