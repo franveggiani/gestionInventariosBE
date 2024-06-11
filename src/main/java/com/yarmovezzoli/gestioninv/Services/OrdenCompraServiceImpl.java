@@ -44,7 +44,6 @@ public class OrdenCompraServiceImpl extends BaseServiceImpl<OrdenCompra,Long> im
     @Override
     public OrdenCompra newOrdenCompra(OrdenCompraDTO ordenCompraDTO) throws Exception {
 
-
         Optional<OrdenCompra> ultimaOrdenCompra = ordencompraRepository.findTopByOrderByNroOrdenCompraDesc();
         OrdenCompra ordenCompra = new OrdenCompra();
 

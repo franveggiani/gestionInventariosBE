@@ -25,7 +25,7 @@ public class ProveedorArticulo extends Base{
     @JoinColumn(name = "articulo_id")
     private Articulo articuloId;
 
-     @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)       //LO METI DE NUEVO, CAMBIE LA NAVEGABILIDAD
     @JoinColumn(name = "proveedor_id")
     private Proveedor proveedor;
 
