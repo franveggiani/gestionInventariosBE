@@ -105,7 +105,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 demandaHistorica.setFechaDesde(fechaDesde);
                 demandaHistorica.setFechaHasta(fechaHasta);
                 demandaHistorica.setArticulo(articulo);
-                demandaHistorica.setTipoPeriodo(tipoPeriodo.name());
+                demandaHistorica.setTipoPeriodo(tipoPeriodo);
 
             } else {
                 throw new Exception("Error: El artículo requerido no ha sido encontrado");
@@ -153,6 +153,9 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 //En la primera corrida se van a crear los históricos de demanda necesarios
                 if (i == 0){
                     for (int j = 0; j < numeroPeriodos; j++) {
+
+                        //CREAR CONDICION EN CASO DE QUE YA EXISTA LA DH
+
                         DemandaHistoricaRequest demandaHistoricaRequest = new DemandaHistoricaRequest();
 
                         demandaHistoricaRequest.setArticuloId(idArticulo);

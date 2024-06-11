@@ -25,8 +25,18 @@ public class ProveedorArticulo extends Base{
     @JoinColumn(name = "articulo_id")
     private Articulo articulo;
 
-    @ManyToOne(fetch = FetchType.LAZY)       //LO METI DE NUEVO, CAMBIE LA NAVEGABILIDAD
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proveedor_id")
     private Proveedor proveedor;
+
+    @Column(name = "punto_pedido")
+    private int puntoPedido;
+
+    @Column(name = "stock_seguridad")
+    private int stockSeguridad;
+
+    @Column(name = "costo_orden")
+    private float costoOrden;
+
 
 }
