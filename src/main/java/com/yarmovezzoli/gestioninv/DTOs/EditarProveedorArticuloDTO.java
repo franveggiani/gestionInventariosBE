@@ -1,5 +1,9 @@
 package com.yarmovezzoli.gestioninv.DTOs;
 
-public class CrearProveedorDTO {
-    
+import lombok.Data;
+
+@Data
+public class EditarProveedorArticuloDTO {
+    Long proveedorArticuloID;
+    int demora;
 }
