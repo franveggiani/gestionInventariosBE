@@ -36,6 +36,6 @@ public class DemandaHistorica extends Base{
     private LocalDate fechaHasta;
 
     @Column(name = "tipoPeriodo")
-    private String tipoPeriodo;
+    private TipoPeriodo tipoPeriodo;
 
 }

@@ -1,5 +1,7 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
+import com.yarmovezzoli.gestioninv.Enums.EstadoArticulo;
+import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,9 +32,8 @@ public class OrdenCompra extends Base{
     @JoinColumn(name = "proveedor_id")
     private Proveedor proveedor;
 
-    @ManyToOne
-    @JoinColumn(name = "estado_orden_compra_id")
-    private EstadoOrdenCompra estadoOrdenCompra;
+    @JoinColumn(name = "estado_orden_compra")
+    private EstadoOrden estadoOrdenCompra;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
