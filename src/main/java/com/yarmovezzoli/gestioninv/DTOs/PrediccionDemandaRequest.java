@@ -15,6 +15,8 @@ public class PrediccionDemandaRequest {
     private Long articuloId;
     private TipoPrediccion tipoPrediccion;
     private int cantidadPredicciones;
+    private Double[] ponderaciones;
+    private float alpha;
 
     //Buscar ventas que coincidan con el articulo proporcionado acá
 

@@ -18,6 +18,7 @@ import com.yarmovezzoli.gestioninv.Strategy.PrediccionDemandaStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -145,6 +146,13 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
             //Cuántos días voy a agregar a la fecha para recorrer periodos
             Long cantDiasAgregados = tipoPeriodo.getDias();
 
+            //Asigno parámetros para calcular la predicción según el tipo
+            if (tipoPrediccion.equals(TipoPrediccion.PROM_MOVIL_PONDERADO)){
+                parametros.put("ponderaciones", prediccionDemandaRequest.getPonderaciones());
+            } else if (tipoPrediccion.equals(TipoPrediccion.EXPONENCIAL)){
+                parametros.put("alpha", prediccionDemandaRequest.getAlpha());
+            }
+
             List<Double> listaCantidades = new ArrayList<>();
             Map<String, Double> listaPredicciones = new HashMap<>();
 
@@ -154,26 +162,34 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 if (i == 0){
                     for (int j = 0; j < numeroPeriodos; j++) {
 
-                        //CREAR CONDICION EN CASO DE QUE YA EXISTA LA DH
+                        //BUSQUEDA DE DH
 
-                        DemandaHistoricaRequest demandaHistoricaRequest = new DemandaHistoricaRequest();
+                        Optional<DemandaHistorica> demandaHistoricaBuscada = demandaHistoricaRepository.findByFechaDesde(comienzoDH);
+                        DemandaHistorica demandaHistorica;
 
-                        demandaHistoricaRequest.setArticuloId(idArticulo);
-                        demandaHistoricaRequest.setFechaDesde(comienzoDH);
-                        demandaHistoricaRequest.setTipoPeriodo(tipoPeriodo);
+                        if(demandaHistoricaBuscada.isPresent()){
+                            demandaHistorica = demandaHistoricaBuscada.get();
+                        } else {
+                            DemandaHistoricaRequest demandaHistoricaRequest = new DemandaHistoricaRequest();
 
-                        DemandaHistorica demandaHistorica = createDemandaHistorica(demandaHistoricaRequest);
-                        demandaHistoricaRepository.save(demandaHistorica);
+                            demandaHistoricaRequest.setArticuloId(idArticulo);
+                            demandaHistoricaRequest.setFechaDesde(comienzoDH);
+                            demandaHistoricaRequest.setTipoPeriodo(tipoPeriodo);
+
+                            demandaHistorica = createDemandaHistorica(demandaHistoricaRequest);
+                            demandaHistoricaRepository.save(demandaHistorica);
+                        }
 
                         comienzoDH = comienzoDH.plusDays(cantDiasAgregados);
-
                         listaCantidades.add(Double.valueOf(demandaHistorica.getCantidadTotal()));
                     }
 
                     parametros.put("arregloCantidades", listaCantidades);
+
+                    //Como después se va a persistir la prediccion, vamos a guardarla en la BD y vamos a crear un DTO para mostrar los resultados junto con la DH correspondiente
                     listaPredicciones.put(fechaDesdePrediccion.getMonth().name(), prediccionDemandaStrategy.predecirDemanda(parametros));
 
-                } else {
+                } else if (!tipoPrediccion.equals(TipoPrediccion.PROM_MOVIL_PONDERADO)) {
 
                     //Elimino primer elemento y agrego el último que va a ser la última predicción
                     listaCantidades.remove(0);
@@ -185,9 +201,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                     fechaDesdePrediccion = fechaDesdePrediccion.plusDays(fechaDesdePrediccion.getMonth().length(false));
 
                     listaPredicciones.put(fechaDesdePrediccion.getMonth().name(), prediccionDemandaStrategy.predecirDemanda(parametros));
-
                 }
-
             }
             
             return listaPredicciones;
