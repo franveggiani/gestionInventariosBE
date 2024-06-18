@@ -22,15 +22,18 @@ public class PrediccionDemanda extends Base{
     private Double prediccion;
 
     @Column(name = "fecha_hora_desde")
-    private LocalDate fechaHoraDesde;
+    private LocalDate fechaDesde;
 
     @Column(name = "fecha_hora_hasta")
-    private LocalDate FechaHoraHasta;
+    private LocalDate fechaHasta;
 
     @Column(name = "metodo_prediccion")
     private TipoPrediccion tipoPrediccion;
 
-    @ManyToOne
+    @Column(name = "fecha_prediccion_realizada")
+    private LocalDate fechaPrediccionRealizada;
+
+    @ManyToOne(optional = true)
     private Articulo articulo;
 
 }
