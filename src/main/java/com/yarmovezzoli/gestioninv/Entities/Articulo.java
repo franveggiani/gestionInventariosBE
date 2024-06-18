@@ -1,5 +1,7 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
+import com.yarmovezzoli.gestioninv.Enums.EstadoArticulo;
+import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,33 +22,22 @@ public class Articulo extends Base{
     @Column(name = "costo_almacenamiento")
     private float costoAlmacenamiento;
 
-    @Column(name = "costo_orden")
-    private float costoOrden;
-
     @Column(name = "lote_optimo")
     private int loteOptimo;
 
     @Column(name = "nombre")
     private String nombre;
 
-    @Column(name = "punto_pedido")
-    private int puntoPedido;
-
     @Column(name = "stock_actual")
     private int stockActual;
-
-    @Column(name = "stock_seguridad")
-    private int stockSeguridad;
 
     @Column(name = "tiempo_entre_pedidos")
     private int tiempoEntrePedidos;
 
-    @ManyToOne
-    @JoinColumn(name = "estado_articulo_id")
+    @JoinColumn(name = "estado_articulo")
     private EstadoArticulo estadoArticulo;
 
-    @ManyToOne
-    @JoinColumn(name = "modelo_inventario_id")
+    @JoinColumn(name = "modelo_inventario")
     private ModeloInventario modeloInventario;
 
     public void descontarStock(int cantidad){

@@ -19,10 +19,11 @@ public class Proveedor extends Base{
 
     @Column(name = "nombre")
     private String nombre;
-/*
-    @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL)
-    private List<ProveedorArticulo> proveedorArticulo;
 
+    //@OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL)
+    //private List<ProveedorArticulo> proveedorArticulo;
+
+    /*
     @OneToMany(mappedBy = "proveedor", cascade = CascadeType.ALL)
     private List<OrdenCompra> ordenesCompra;
  */

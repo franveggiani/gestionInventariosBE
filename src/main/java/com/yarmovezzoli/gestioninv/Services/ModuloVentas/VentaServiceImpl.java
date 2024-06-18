@@ -1,21 +1,21 @@
 package com.yarmovezzoli.gestioninv.Services.ModuloVentas;
 
 import com.yarmovezzoli.gestioninv.DTOs.DemandaHistoricaRequest;
+import com.yarmovezzoli.gestioninv.DTOs.PrediccionDTO;
 import com.yarmovezzoli.gestioninv.DTOs.PrediccionDemandaRequest;
 import com.yarmovezzoli.gestioninv.DTOs.VentaRequestDTO;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.DemandaHistorica;
+import com.yarmovezzoli.gestioninv.Entities.PrediccionDemanda;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
 import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
 import com.yarmovezzoli.gestioninv.Enums.TipoPrediccion;
 import com.yarmovezzoli.gestioninv.Factory.PrediccionDemandaFactory;
-import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
-import com.yarmovezzoli.gestioninv.Repositories.BaseRepository;
-import com.yarmovezzoli.gestioninv.Repositories.DemandaHistoricaRepository;
-import com.yarmovezzoli.gestioninv.Repositories.VentaRepository;
+import com.yarmovezzoli.gestioninv.Repositories.*;
 import com.yarmovezzoli.gestioninv.Services.BaseServiceImpl;
 import com.yarmovezzoli.gestioninv.Strategy.PrediccionDemandaStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,12 +30,15 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     ArticuloRepository articuloRepository;
     @Autowired
     DemandaHistoricaRepository demandaHistoricaRepository;
+    @Autowired
+    PrediccionDemandaRepository prediccionDemandaRepository;
 
-    public VentaServiceImpl(BaseRepository<Venta, Long> baseRepository, VentaRepository ventaRepository, ArticuloRepository articuloRepository, DemandaHistoricaRepository demandaHistoricaRepository){
+    public VentaServiceImpl(BaseRepository<Venta, Long> baseRepository, VentaRepository ventaRepository, ArticuloRepository articuloRepository, DemandaHistoricaRepository demandaHistoricaRepository, PrediccionDemandaRepository prediccionDemandaRepository){
         super(baseRepository);
         this.ventaRepository = ventaRepository;
         this.articuloRepository = articuloRepository;
         this.demandaHistoricaRepository = demandaHistoricaRepository;
+        this.prediccionDemandaRepository = prediccionDemandaRepository;
     }
 
     @Override
@@ -105,7 +108,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 demandaHistorica.setFechaDesde(fechaDesde);
                 demandaHistorica.setFechaHasta(fechaHasta);
                 demandaHistorica.setArticulo(articulo);
-                demandaHistorica.setTipoPeriodo(tipoPeriodo.name());
+                demandaHistorica.setTipoPeriodo(tipoPeriodo);
 
             } else {
                 throw new Exception("Error: El artículo requerido no ha sido encontrado");
@@ -121,7 +124,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     }
 
     @Override
-    public Map<String, Double> getPrediccionDemanda(PrediccionDemandaRequest prediccionDemandaRequest) throws Exception {
+    public List<PrediccionDTO> getPrediccionDemanda(PrediccionDemandaRequest prediccionDemandaRequest) throws Exception {
         try {
 
             //Parámetros iniciales
@@ -131,6 +134,15 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
             TipoPeriodo tipoPeriodo = prediccionDemandaRequest.getTipoPeriodo();
             TipoPrediccion tipoPrediccion = prediccionDemandaRequest.getTipoPrediccion();
             LocalDate fechaDesdePrediccion = prediccionDemandaRequest.getFechaDesdePrediccion();
+            Articulo articulo;
+
+            //Busqueda de artículo
+            Optional<Articulo> articuloOptional = articuloRepository.findById(idArticulo);
+            if(articuloOptional.isPresent()){
+                articulo = articuloOptional.get();
+            } else {
+                throw new Exception("Error: El artículo requerido no ha sido encontrado");
+            }
 
             //Creo instancia para calcular la predicción según el tipo
             PrediccionDemandaFactory prediccionDemandaFactory = PrediccionDemandaFactory.getInstance();
@@ -140,54 +152,101 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
             Map<String, Object> parametros = new HashMap<>();
 
             //Calculo cuánto tiempo voy a retroceder para comenzar a sacar la DH
-            LocalDate comienzoDH = fechaDesdePrediccion.minusDays(tipoPeriodo.getDias()*numeroPeriodos);    //30días * 3periodos = 90 días atrás (si es mensual)
+            LocalDate fechaRetrocedida = fechaDesdePrediccion.minusDays(tipoPeriodo.getDias()*numeroPeriodos);    //30días * 3periodos = 90 días atrás (si es mensual)
 
             //Cuántos días voy a agregar a la fecha para recorrer periodos
-            Long cantDiasAgregados = tipoPeriodo.getDias();
+            Long agregarDias = tipoPeriodo.getDias();
 
-            List<Double> listaCantidades = new ArrayList<>();
-            Map<String, Double> listaPredicciones = new HashMap<>();
+            //Asigno parámetros para calcular la predicción según el tipo
+            if (tipoPrediccion.equals(TipoPrediccion.PROM_MOVIL_PONDERADO)){
+                parametros.put("ponderaciones", prediccionDemandaRequest.getPonderaciones());
+            } else if (tipoPrediccion.equals(TipoPrediccion.EXPONENCIAL)){
+                parametros.put("alpha", prediccionDemandaRequest.getAlpha());
+            }
 
-            for (int i = 0; i < cantidadPredicciones; i++) {
+            List<Double> arregloCantidades = new ArrayList<>();
+            List<DemandaHistorica> demandaHistoricaList = new ArrayList<>();
+            List<PrediccionDemanda> prediccionDemandaList = new ArrayList<>();
+            List<PrediccionDTO> prediccionDTOList = new ArrayList<>();
 
-                //En la primera corrida se van a crear los históricos de demanda necesarios
-                if (i == 0){
-                    for (int j = 0; j < numeroPeriodos; j++) {
-                        DemandaHistoricaRequest demandaHistoricaRequest = new DemandaHistoricaRequest();
+            //Búsqueda o creación de DH si no se ha creado antes
+            for (int i = 0; i < numeroPeriodos; i++) {
 
-                        demandaHistoricaRequest.setArticuloId(idArticulo);
-                        demandaHistoricaRequest.setFechaDesde(comienzoDH);
-                        demandaHistoricaRequest.setTipoPeriodo(tipoPeriodo);
+                Optional<DemandaHistorica> demandaHistoricaBuscada = demandaHistoricaRepository.findByFechaDesde(fechaRetrocedida);
+                DemandaHistorica demandaHistorica;
 
-                        DemandaHistorica demandaHistorica = createDemandaHistorica(demandaHistoricaRequest);
-                        demandaHistoricaRepository.save(demandaHistorica);
-
-                        comienzoDH = comienzoDH.plusDays(cantDiasAgregados);
-
-                        listaCantidades.add(Double.valueOf(demandaHistorica.getCantidadTotal()));
-                    }
-
-                    parametros.put("arregloCantidades", listaCantidades);
-                    listaPredicciones.put(fechaDesdePrediccion.getMonth().name(), prediccionDemandaStrategy.predecirDemanda(parametros));
-
+                if(demandaHistoricaBuscada.isPresent()){
+                    demandaHistorica = demandaHistoricaBuscada.get();
                 } else {
+                    //Creamos las demandas históricas si no existen
+                    DemandaHistoricaRequest demandaHistoricaRequest = new DemandaHistoricaRequest();
+
+                    demandaHistoricaRequest.setArticuloId(idArticulo);
+                    demandaHistoricaRequest.setFechaDesde(fechaRetrocedida);
+                    demandaHistoricaRequest.setTipoPeriodo(tipoPeriodo);
+
+                    demandaHistorica = createDemandaHistorica(demandaHistoricaRequest);
+                    demandaHistoricaRepository.save(demandaHistorica);
+                }
+
+                demandaHistoricaList.add(demandaHistorica);
+                fechaRetrocedida = fechaRetrocedida.plusDays(agregarDias);
+            }
+
+            //Obtenemos las cantidades de cada Demanda histórica
+            demandaHistoricaList.forEach(dh -> {
+                arregloCantidades.add(Double.valueOf(dh.getCantidadTotal()));
+            });
+
+            parametros.put("arregloCantidades", arregloCantidades);
+            parametros.put("articulo", articulo);
+            parametros.put("fechaDesdePrediccion", fechaDesdePrediccion);
+            parametros.put("fechaHastaPrediccion", fechaDesdePrediccion.plusDays(fechaDesdePrediccion.getMonth().length(false)));
+
+            //Hacemos la predicción
+            for (int i = 0; i < cantidadPredicciones; i++) {
+                if (i == 0){
+
+                    //Hago la predicción
+                    PrediccionDemanda prediccion = prediccionDemandaStrategy.predecirDemanda(parametros);
+                    prediccionDemandaList.add(prediccion);
+
+                    prediccionDemandaRepository.save(prediccion);
+
+                } else if (!tipoPrediccion.equals(TipoPrediccion.PROM_MOVIL_PONDERADO)) {
 
                     //Elimino primer elemento y agrego el último que va a ser la última predicción
-                    listaCantidades.removeFirst();
-                    listaCantidades.addLast(listaPredicciones.get(fechaDesdePrediccion.getMonth().name()));
-
-                    parametros.put("arregloCantidades", listaCantidades);
+                    arregloCantidades.remove(0);
+                    arregloCantidades.add(prediccionDemandaList.getLast().getPrediccion());
 
                     //Nueva fecha de predicción
                     fechaDesdePrediccion = fechaDesdePrediccion.plusDays(fechaDesdePrediccion.getMonth().length(false));
 
-                    listaPredicciones.put(fechaDesdePrediccion.getMonth().name(), prediccionDemandaStrategy.predecirDemanda(parametros));
+                    parametros.put("arregloCantidades", arregloCantidades);
+                    parametros.put("fechaDesdePrediccion", fechaDesdePrediccion);
+                    parametros.put("fechaHastaPrediccion", fechaDesdePrediccion.plusDays(fechaDesdePrediccion.getMonth().length(false)));
 
+                    PrediccionDemanda prediccion = prediccionDemandaStrategy.predecirDemanda(parametros);
+                    prediccionDemandaList.add(prediccion);
                 }
+            }
 
+            //Creo lista de DTO's
+            for (int i = 0; i < prediccionDemandaList.size(); i++) {
+
+                PrediccionDemanda prediccion = prediccionDemandaList.get(i);
+
+                PrediccionDTO prediccionDTO = new PrediccionDTO();
+                prediccionDTO.setFechaDesdePrediccion(prediccion.getFechaDesde());
+                prediccionDTO.setFechaHastaPrediccion(prediccion.getFechaHasta());
+                prediccionDTO.setCantidadPredecida(prediccion.getPrediccion());
+                prediccionDTO.setNombreArticulo(prediccion.getArticulo().getNombre());
+                prediccionDTO.setIdArticulo(prediccion.getArticulo().getId());
+
+                prediccionDTOList.add(prediccionDTO);
             }
             
-            return listaPredicciones;
+            return prediccionDTOList;
 
         } catch (Exception e){
             throw new Exception(e.getMessage());
