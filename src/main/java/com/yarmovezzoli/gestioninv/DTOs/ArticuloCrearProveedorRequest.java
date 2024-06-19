@@ -6,6 +6,8 @@ import lombok.Getter;
 public class ArticuloCrearProveedorRequest {
 
     private Long idArticulo;
-    private int demoraPromedio;
+    private Double demora;
+    private Double costoPedido;
+    private Long demanda;
 
 }

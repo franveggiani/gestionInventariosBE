@@ -2,7 +2,7 @@ package com.yarmovezzoli.gestioninv.Controllers.ModuloArticulos;
 
 import com.yarmovezzoli.gestioninv.Controllers.BaseControllerImpl;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
-import com.yarmovezzoli.gestioninv.Services.ArticuloServiceImpl;
+import com.yarmovezzoli.gestioninv.Services.ModuloArticulos.ArticuloServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

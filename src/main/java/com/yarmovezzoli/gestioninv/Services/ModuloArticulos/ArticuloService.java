@@ -1,4 +1,4 @@
-package com.yarmovezzoli.gestioninv.Services;
+package com.yarmovezzoli.gestioninv.Services.ModuloArticulos;
 
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;

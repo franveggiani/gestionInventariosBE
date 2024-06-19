@@ -1,6 +1,6 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
-import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
+import  com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

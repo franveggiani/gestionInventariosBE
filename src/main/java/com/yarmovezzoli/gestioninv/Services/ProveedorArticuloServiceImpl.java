@@ -1,6 +1,6 @@
 package com.yarmovezzoli.gestioninv.Services;
 
-import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorArticuloDTO;
+import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorArticuloRequest;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorArticuloDTO;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
@@ -27,23 +27,23 @@ public class ProveedorArticuloServiceImpl extends BaseServiceImpl<ProveedorArtic
     private ProveedorArticuloRepository proveedorArticuloRepository;
 
     @Override
-    public ProveedorArticulo nuevoProveedorArticulo(CrearProveedorArticuloDTO crearProveedorArticuloDTO) throws Exception {
+    public ProveedorArticulo nuevoProveedorArticulo(CrearProveedorArticuloRequest crearProveedorArticuloRequest) throws Exception {
         ProveedorArticulo proveedorArticulo = new ProveedorArticulo();
 
-        Optional<Articulo> articuloOptional = articuloRepository.findById(crearProveedorArticuloDTO.getArticuloId());
+        Optional<Articulo> articuloOptional = articuloRepository.findById(crearProveedorArticuloRequest.getArticuloId());
         if (!articuloOptional.isPresent()) {
             throw new Exception("Articulo no encontrado");
         }
         Articulo articulo = articuloOptional.get();
 
-        Optional<Proveedor> proveedorOptional = proveedorRepository.findById(crearProveedorArticuloDTO.getProveedorId());
+        Optional<Proveedor> proveedorOptional = proveedorRepository.findById(crearProveedorArticuloRequest.getProveedorId());
         if (!proveedorOptional.isPresent()) {
             throw new Exception("Proveedor no encontrado");
         }
         Proveedor proveedor = proveedorOptional.get();
 
         proveedorArticulo.setArticulo(articulo);
-        proveedorArticulo.setDemoraPromedio(crearProveedorArticuloDTO.getDemora());
+        proveedorArticulo.setDemoraPromedio(crearProveedorArticuloRequest.getDemora());
         proveedorArticulo.setProveedor(proveedor);
 
 

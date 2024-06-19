@@ -1,8 +1,10 @@
-package com.yarmovezzoli.gestioninv.Services;
+package com.yarmovezzoli.gestioninv.Services.ModuloArticulos;
 
 import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
 import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
 import com.yarmovezzoli.gestioninv.Repositories.BaseRepository;
+import com.yarmovezzoli.gestioninv.Services.BaseServiceImpl;
+import com.yarmovezzoli.gestioninv.Services.ModuloArticulos.ArticuloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class ArticuloServiceImpl extends BaseServiceImpl<Articulo, Long> implements ArticuloService{
+public class ArticuloServiceImpl extends BaseServiceImpl<Articulo, Long> implements ArticuloService {
 
     @Autowired
     private ArticuloRepository articuloRepository;

@@ -15,28 +15,48 @@ import lombok.Setter;
 
 public class ProveedorArticulo extends Base{
     @Column(name = "demora_promedio")
-    private int demoraPromedio;
+    private Double demoraPromedio;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "estado_proveedor_articulo_id")
-    private EstadoProveedorArticulo estadoActual;
+    @Column(name = "punto_pedido")
+    private Long puntoPedido;
+
+    @Column(name = "stock_seguridad")
+    private int stockSeguridad;
+
+    @Column(name = "costo_pedido")
+    private Double costoPedido;
+
+    @Column
+    private Long EOQ;
+
+    @Column
+    private Long demanda;
+
+    @Column
+    private Double CGI;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
     private Articulo articulo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "proveedor_id")
     private Proveedor proveedor;
 
-    @Column(name = "punto_pedido")
-    private int puntoPedido;
+    @ManyToOne
+    @JoinColumn(name = "estado_proveedor_articulo_id")
+    private EstadoProveedorArticulo estadoActual;
 
-    @Column(name = "stock_seguridad")
-    private int stockSeguridad;
+    public void calcularEOQ(Double cp, Double ca, Long D){
+        this.EOQ = Math.round(Math.sqrt((2*D*cp)/ca));
+    }
 
-    @Column(name = "costo_orden")
-    private float costoOrden;
+    public void calcularPuntoPedido(Long D, Double demoraPromedio){
+        this.puntoPedido = Math.round(D * demoraPromedio);
+    }
 
+    public void calcularCGI(Double cp, Double ca, Long D, Double P, Long Q){
+        this.CGI = (P * Q) + (cp * D) + (ca * Q/2);
+    }
 
 }

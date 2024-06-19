@@ -1,10 +1,11 @@
 package com.yarmovezzoli.gestioninv.Controllers.ModuloArticulos;
 
+import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorArticuloRequest;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorDTO;
 import com.yarmovezzoli.gestioninv.Controllers.BaseControllerImpl;
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorRequest;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
-import com.yarmovezzoli.gestioninv.Services.ProveedorServiceImpl;
+import com.yarmovezzoli.gestioninv.Services.ModuloInventarios.ProveedorServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,6 +51,15 @@ public class ProveedorController extends BaseControllerImpl<Proveedor, Proveedor
     public ResponseEntity<?> crearProveedor(@RequestBody CrearProveedorRequest crearProveedorRequest){
         try{
             return ResponseEntity.status(HttpStatus.OK).body(service.crearProveedor(crearProveedorRequest));
+        }catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
+
+    @PostMapping("/crearProveedorArticulo")
+    public ResponseEntity<?> crearProveedorArticulo(@RequestBody CrearProveedorArticuloRequest crearProveedorArticuloRequest){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(service.crearProveedorArticulo(crearProveedorArticuloRequest));
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
         }

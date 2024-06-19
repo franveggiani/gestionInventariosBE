@@ -20,19 +20,13 @@ import java.util.List;
 public class Articulo extends Base{
 
     @Column(name = "costo_almacenamiento")
-    private float costoAlmacenamiento;
-
-    @Column(name = "lote_optimo")
-    private int loteOptimo;
+    private Double costoAlmacenamiento;
 
     @Column(name = "nombre")
     private String nombre;
 
     @Column(name = "stock_actual")
     private int stockActual;
-
-    @Column(name = "tiempo_entre_pedidos")
-    private int tiempoEntrePedidos;
 
     @JoinColumn(name = "estado_articulo")
     private EstadoArticulo estadoArticulo;
