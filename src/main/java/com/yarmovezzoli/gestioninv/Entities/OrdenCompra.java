@@ -32,7 +32,7 @@ public class OrdenCompra extends Base{
     @Column(name = "nombre_estado")
     private EstadoOrden nombreEstado;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "proveedor_id")
     private Proveedor proveedor;
 

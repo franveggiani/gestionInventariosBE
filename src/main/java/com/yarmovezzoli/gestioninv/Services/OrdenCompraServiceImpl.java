@@ -4,6 +4,7 @@ import com.yarmovezzoli.gestioninv.DTOs.OrdenCompraDTO;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.OrdenCompra;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
+import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.BaseRepository;
 import com.yarmovezzoli.gestioninv.Repositories.OrdenCompraRepository;
@@ -41,50 +42,68 @@ public class OrdenCompraServiceImpl extends BaseServiceImpl<OrdenCompra,Long> im
             throw new Exception(e.getMessage());
         }
     }
+
+    @Override
+    public OrdenCompra confirmarOrden(Long id) throws Exception {
+        try {
+            Optional<OrdenCompra> ordenCompra = ordencompraRepository.findById(id);
+            if (ordenCompra.isPresent()) {
+                OrdenCompra orden = ordenCompra.get();
+                orden.setNombreEstado(EstadoOrden.CONFIRMADO);
+                ordencompraRepository.save(orden);
+
+                //Actualizamos el stock de los articulos
+                Articulo articulo = orden.getArticulo();
+                articulo.setStockActual(articulo.getStockActual() + orden.getCantidad());
+                articuloRepository.save(articulo);
+
+                return orden;
+
+            } else {
+                throw new Exception("No se encontró la orden de compra");
+            }
+
+        } catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+
     @Override
     public OrdenCompra newOrdenCompra(OrdenCompraDTO ordenCompraDTO) throws Exception {
 
         Optional<OrdenCompra> ultimaOrdenCompra = ordencompraRepository.findTopByOrderByNroOrdenCompraDesc();
         OrdenCompra ordenCompra = new OrdenCompra();
 
-        if (ultimaOrdenCompra.isEmpty()){
+        if (ultimaOrdenCompra.isEmpty()) {
             ordenCompra.setNroOrdenCompra(0);
-        }
-
-        else {
+        } else {
             int nummasaltoOC = ultimaOrdenCompra.get().getNroOrdenCompra();
-            ordenCompra.setNroOrdenCompra(nummasaltoOC+1);
+            ordenCompra.setNroOrdenCompra(nummasaltoOC + 1);
         }
 
         ordenCompra.setCantidad(ordenCompraDTO.getCantidad());
         ordenCompra.setDemoraEstimada(ordenCompraDTO.getDemoraEstimada());
         ordenCompra.setFechaHoraAlta(LocalDate.now());
+        ordenCompra.setNombreEstado(PENDIENTE);
 
-        Optional<Proveedor> p1 =  proveedorRepository.findById(ordenCompraDTO.getProveedorId());
-
+        Optional<Proveedor> p1 = proveedorRepository.findById(ordenCompraDTO.getProveedorId());
+        if (p1.isPresent()) {
             Proveedor proveedor = p1.get();
             ordenCompra.setProveedor(proveedor);
 
-        Optional<Articulo> a1 =  articuloRepository.findById(ordenCompraDTO.getArticuloId());
+            Optional<Articulo> a1 = articuloRepository.findById(ordenCompraDTO.getArticuloId());
 
-        Articulo articulo = a1.get();
-        ordenCompra.setArticulo(articulo);
+            if (a1.isPresent()) {
+                Articulo articulo = a1.get();
+                ordenCompra.setArticulo(articulo);
 
-            if (p1.isPresent()) {
-                System.out.println("Proveedor encontrado");
-        }
-            else {
-                throw new Exception("No se encontró al proveedor");
+                ordencompraRepository.save(ordenCompra);
+            } else {
+                throw new Exception("No se encontró el articulo");
             }
-
-            if (a1.isPresent()){
-            System.out.println("Articulo encontrado");
+        } else {
+            throw new Exception("No se encontró al proveedor");
         }
-            else {
-                throw new Exception("No se enontró el articulo");
-            }
-
-        ordenCompra.setNombreEstado(PENDIENTE);
 
         return ordenCompra;
     }

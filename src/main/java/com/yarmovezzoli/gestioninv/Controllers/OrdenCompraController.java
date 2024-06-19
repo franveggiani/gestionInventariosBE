@@ -34,4 +34,13 @@ public class OrdenCompraController extends BaseControllerImpl<OrdenCompra, Orden
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
+
+    @PutMapping("/confirmarOrden")
+    public ResponseEntity<?> confirmarOrden(@RequestParam("id") Long id){
+        try{
+            return ResponseEntity.status(HttpStatus.OK).body(service.confirmarOrden(id));
+        }catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
 }
