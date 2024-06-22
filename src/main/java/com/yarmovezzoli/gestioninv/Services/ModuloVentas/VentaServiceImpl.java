@@ -217,7 +217,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
                     //Elimino primer elemento y agrego el último que va a ser la última predicción
                     arregloCantidades.remove(0);
-                    arregloCantidades.add(prediccionDemandaList.getLast().getPrediccion());
+                    arregloCantidades.add(prediccionDemandaList.get(prediccionDemandaList.size() - 1).getPrediccion());
 
                     //Nueva fecha de predicción
                     fechaDesdePrediccion = fechaDesdePrediccion.plusDays(fechaDesdePrediccion.getMonth().length(false));
