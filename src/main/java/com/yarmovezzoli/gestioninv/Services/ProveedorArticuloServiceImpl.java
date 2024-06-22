@@ -12,6 +12,7 @@ import com.yarmovezzoli.gestioninv.Repositories.ProveedorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -63,4 +64,9 @@ public class ProveedorArticuloServiceImpl extends BaseServiceImpl<ProveedorArtic
             }
 
         }
+
+    @Override
+    public List<Articulo> obtenerArticulosPorProveedor(Long proveedorId) throws Exception {
+        return proveedorArticuloRepository.findArticulosByProveedorId(proveedorId);
     }
+}

@@ -33,7 +33,7 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
         }
     }
 
-    @GetMapping("prediccionDemanda")
+    @PostMapping("prediccionDemanda")
     public ResponseEntity<?> createDemandaHistorica(@RequestBody PrediccionDemandaRequest prediccionDemandaRequest){
         try {
             return ResponseEntity.status(HttpStatus.OK).body(service.getPrediccionDemanda(prediccionDemandaRequest));
