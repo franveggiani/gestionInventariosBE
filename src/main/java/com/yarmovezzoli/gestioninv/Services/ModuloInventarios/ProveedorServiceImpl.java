@@ -4,19 +4,25 @@ import com.yarmovezzoli.gestioninv.DTOs.ArticuloCrearProveedorRequest;
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorArticuloRequest;
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorRequest;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorDTO;
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Entities.ProveedorArticulo;
+import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
+import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
+import com.yarmovezzoli.gestioninv.Factory.CalculosInventarioFactory;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.BaseRepository;
 import com.yarmovezzoli.gestioninv.Repositories.ProveedorArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.ProveedorRepository;
 import com.yarmovezzoli.gestioninv.Services.BaseServiceImpl;
 import com.yarmovezzoli.gestioninv.Services.ModuloInventarios.ProveedorService;
+import com.yarmovezzoli.gestioninv.Strategy.CalculosInventario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -28,12 +34,15 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
     private ArticuloRepository articuloRepository;
     @Autowired
     private ProveedorArticuloRepository proveedorArticuloRepository;
+    @Autowired
+    private CalculosInventarioFactory calculosInventarioFactory;
 
-    public ProveedorServiceImpl(BaseRepository<Proveedor, Long> baseRepository, ArticuloRepository articuloRepository, ProveedorRepository proveedorRepository, ProveedorArticuloRepository proveedorArticuloRepository) {
+    public ProveedorServiceImpl(BaseRepository<Proveedor, Long> baseRepository, ArticuloRepository articuloRepository, ProveedorRepository proveedorRepository, ProveedorArticuloRepository proveedorArticuloRepository, CalculosInventarioFactory calculosInventarioFactory) {
         super(baseRepository);
         this.articuloRepository = articuloRepository;
         this.proveedorRepository = proveedorRepository;
         this.proveedorArticuloRepository = proveedorArticuloRepository;
+        this.calculosInventarioFactory = calculosInventarioFactory;
     }
 
     @Override
@@ -106,45 +115,21 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
         }
     }
     @Override
-    public ProveedorArticulo crearProveedorArticulo(CrearProveedorArticuloRequest crearProveedorArticuloRequest) throws Exception {
+    public ProveedorArticulo crearProveedorArticulo(DTODatosInventario datosInventario) throws Exception {
         try {
-            Long demanda = crearProveedorArticuloRequest.getDemanda();                                                                  //Agregar al Request opcional de crear proveedor con PA
-            Double costoPedido = crearProveedorArticuloRequest.getCostoPedido();                                                        //Agregado
-            Double demoraPromedio = crearProveedorArticuloRequest.getDemora();                                                          //Agregado
-            Double precioPorUnidad = crearProveedorArticuloRequest.getPrecioPorUnidad();                                                //Esto agregarlo al Request para crear Proveedor con PA
-            Optional<Articulo> articulo = articuloRepository.findById(crearProveedorArticuloRequest.getArticuloId());
-            Optional<Proveedor> proveedor = proveedorRepository.findById(crearProveedorArticuloRequest.getProveedorId());
+            CalculosInventario calculosInventario = calculosInventarioFactory.getCalculosInventario(datosInventario.getModeloInventario());
 
-            if (articulo.isPresent() && proveedor.isPresent()) {                //PENSAR VARIACIÓN PARA EL MODELO DE INTERVALO FIJO
-                ProveedorArticulo proveedorArticulo = new ProveedorArticulo();
+            //Obtener los datos del DTO y pasarlos a CalculosInventario según la estrategia.
+            Map<String, Object> parametros;
 
-                Articulo articulo1 = articulo.get();
-                Proveedor proveedor1 = proveedor.get();
+            //También configurar las clases de estrategia para que devuelvan DTOInventario con los datos a calcular
+            //El resto es historia
 
-                proveedorArticulo.setArticulo(articulo1);                                                                               //Setear articulo
-                proveedorArticulo.setProveedor(proveedor1);                                                                             //Setear proveedor
-                proveedorArticulo.setDemoraPromedio(demoraPromedio);                                                                    //L
-                proveedorArticulo.setCostoPedido(costoPedido);                                                                          //Cp
-                proveedorArticulo.setDemanda(demanda);                                                                                  //D
-
-                Double costoAlmacenamiento = articulo1.getCostoAlmacenamiento();                                                        //Ca                //Agregar al crear el articulo
-
-                proveedorArticulo.calcularEOQ(costoPedido, costoAlmacenamiento, demanda);                                               //EOQ
-                proveedorArticulo.calcularPuntoPedido(demanda, demoraPromedio);                                                         //PP
-                proveedorArticulo.calcularCGI(costoPedido, costoAlmacenamiento, demanda, precioPorUnidad, proveedorArticulo.getEOQ());  //CGI
-
-                proveedorArticuloRepository.save(proveedorArticulo);
-
-                return proveedorArticulo;
-            } else {
-                throw new NoSuchElementException("El articulo o el proveedor no existe");
-            }
-
+            return null;
         }catch (Exception e){
             throw new Exception(e.getMessage());
         }
     }
 
-
-    }
+}
 
