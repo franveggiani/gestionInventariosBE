@@ -1,24 +1,33 @@
 package com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.yarmovezzoli.gestioninv.Entities.EstadoProveedorArticulo;
 import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class DTODatosInventario {
-    //dias de demora
-    int L;
-    //periodo para revisión (revision periodica)
-    int T;
-    //nivel de servicio
-    float Z;
-    Long idArticulo;
-    float costoPedido;
-    int year;
-    int diasLaborales;
-    ModeloInventario modeloInventario;
 
-    //estos se van a calcular, vamos a usar el mismo DTO.
-    float stockSeguridad;
-    int ROP;
-    int q;
+    @JsonProperty("L")
+    private int L;
+    @JsonProperty("T")
+    private int T;
+    @JsonProperty("Z")
+    private float Z;
+    @JsonProperty("idArticulo")
+    private Long idArticulo;
+    @JsonProperty("idProveedor")
+    private Long idProveedor;
+    @JsonProperty("costoPedido")
+    private float costoPedido;
+    @JsonProperty("year")
+    private int year;
+    @JsonProperty("diasLaborales")
+    private int diasLaborales;
+    @JsonProperty("modeloInventario")
+    private ModeloInventario modeloInventario;
+//    @JsonProperty("estadoArticulo")
+//    private EstadoProveedorArticulo estadoProveedorArticulo;
 }

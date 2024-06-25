@@ -64,26 +64,41 @@ public class GestioninvApplication {
 			articuloRepository.save(articulo2);
 			articuloRepository.save(articulo3);
 
+			LocalDate fechaActual = LocalDate.now();
+			LocalDate fechaFinal = fechaActual.minusYears(1);
+
 			Random random = new Random();
 
 			Long id = 0L;
-			for (int i = 0; i < 12; i++) {
+			int diaActual = fechaActual.getDayOfMonth();
 
-				int daysInMonth = Month.of(i + 1).length(false); // false means non-leap year
+			System.out.println(diaActual);
 
-				for (int j = 0; j < daysInMonth; j++) {
-					id += 1;
+			for (int i = 0; i < 13; i++) {
+				int diasDeMesActual = fechaActual.getMonth().length(fechaActual.isLeapYear());
+				int dia = 1;
 
+				if (i == 0) {;
+					dia = diaActual;
+				} else if (i == 12) {
+					diasDeMesActual = diaActual + 1;
+				}
+
+				for (int j = dia; j <= diasDeMesActual; j++) {
+					id = id + 1;
 					Venta venta = new Venta();
 					venta.setId(id);
 					venta.setCantidad(random.nextInt(100));
 					venta.setArticulo(articulo1);
-
-					venta.setFechaHoraAlta(LocalDate.of(2023, i + 1, j + 1));
+					venta.setFechaHoraAlta(fechaFinal);
 					ventaRepository.save(venta);
-				}
-			}
 
+					fechaFinal = fechaFinal.plusDays(1);
+				}
+
+				fechaActual = fechaActual.plusMonths(1);
+
+			}
 			//Para probar la demanda histórica
 
 		};

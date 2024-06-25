@@ -1,5 +1,7 @@
 package com.yarmovezzoli.gestioninv.Strategy;
 
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventarioOutput;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,17 +24,16 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
     ArticuloRepository articuloRepository;
 
     @Override
-    public void getDatosInventario(Map<String, Object> parametros) throws Exception {
-        //Cálculo de stock de seguridad
-        //Voy a suponer momentáneamente Z = 1.65 (98%)
-        //L será por días
+    public DTODatosInventarioOutput getDatosInventario(DTODatosInventario dtoDatosInventario) throws Exception {
 
-        float Z = 1.65f;
-        int L = parametros.get("L") == null? 1 : (int) parametros.get("L");
-        Long idArticulo = parametros.get("idArticulo") == null? 0 : (Long) parametros.get("idArticulo");
-        float costoPedido = parametros.get("costoPedido") == null? 0 : (float) parametros.get("costoPedido");
-        int year = parametros.get("year") == null? 0 : (int) parametros.get("year");
-        int diasLaborales = parametros.get("diasLaborales") == null? 0 : (int) parametros.get("diasLaborales");
+        float Z = dtoDatosInventario.getZ();
+        int L = dtoDatosInventario.getL();
+        Long idArticulo = dtoDatosInventario.getIdArticulo();
+        float costoPedido = dtoDatosInventario.getCostoPedido();
+        int year = dtoDatosInventario.getYear();
+        int diasLaborales = dtoDatosInventario.getDiasLaborales();
+
+        //System.out.println(L + ", " + Z + ", " + costoPedido);
 
         int stockSeguridad;
         float varianza;
@@ -43,34 +45,43 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         //Obtener demanda promedio
         LocalDate fechaActual = LocalDate.now();
 
-        float demandaPromedio = 0;
-        int[] ventasTotales = {0};
-        int[] ventasPorDia = {0};
+        float demandaPromedio;
+        int ventasTotales = 0;
+        List<Integer> ventasPorDia = new ArrayList<>();
+
+        fechaActual = fechaActual.minusDays(L);
 
         for (int i = 0; i < L; i++) {
-            fechaActual = fechaActual.minusDays(5);
 
+            //System.out.println(fechaActual);S
             List<Venta> ventasList = ventaRepository.findByFecha(fechaActual);
+            int ventasDelDia = 0;
 
-            int[] ventasDelDia = {0};
+            for (Venta venta : ventasList) {
+                ventasDelDia += venta.getCantidad();
+            }
 
-            ventasList.forEach(venta -> {
-                ventasTotales[0] += venta.getCantidad();
-                ventasDelDia[0] = venta.getCantidad();
-            });
+            fechaActual = fechaActual.plusDays(1);
 
-            ventasPorDia[i] = ventasDelDia[0];
+            ventasTotales += ventasDelDia;
+            ventasPorDia.add(ventasDelDia);
         }
 
+        System.out.println("Ventas totales: " + ventasTotales);
+
         //Promedio de demanda
-        demandaPromedio = (float) (demandaPromedio / L);
+        demandaPromedio = ventasTotales / L;
+
+        System.out.println("Promedio de demanda: " + demandaPromedio);
 
         //Varianza
         float sumatoria = 0;
         for (int j = 0; j < L; j++) {
-            sumatoria += (float) Math.pow(ventasPorDia[j] - demandaPromedio, 2);
+            sumatoria += (float) Math.pow(ventasPorDia.get(j) - demandaPromedio, 2);
         }
         varianza = sumatoria / (L-1);
+
+        System.out.println("Varianza: " + varianza);
 
         //Desviacion estandar
         desviacionEstandar = (float) Math.sqrt(varianza);
@@ -96,6 +107,7 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         Optional<Articulo> articuloOptional = articuloRepository.findById(idArticulo);
         if (articuloOptional.isPresent()) {
             costoAlmacenamiento = articuloOptional.get().getCostoAlmacenamiento();
+            System.out.println(costoAlmacenamiento);
         }
 
         //Finalmente calculamos EOQ
@@ -103,5 +115,14 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
 
         //Calculando ROP (o PP)
         ROP = (int) demandaPromedio * L + stockSeguridad;
+
+        DTODatosInventarioOutput dtoDatosInventarioOutput = new DTODatosInventarioOutput();
+
+        dtoDatosInventarioOutput.setStockSeguridad(stockSeguridad);
+        dtoDatosInventarioOutput.setQ(EOQ);
+        dtoDatosInventarioOutput.setROP(ROP);
+
+        return dtoDatosInventarioOutput;
+
     }
 }

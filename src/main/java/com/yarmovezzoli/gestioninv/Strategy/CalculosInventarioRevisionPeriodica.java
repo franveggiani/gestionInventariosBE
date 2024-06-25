@@ -1,5 +1,7 @@
 package com.yarmovezzoli.gestioninv.Strategy;
 
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventarioOutput;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,49 +23,50 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
     @Autowired
     ArticuloRepository articuloRepository;
 
-    public void getDatosInventario(Map<String, Object> parametros) { //Cambiar el void después
+    public DTODatosInventarioOutput getDatosInventario(DTODatosInventario dtoDatosInventario) { //Cambiar el void después
 
         //Cálculo de stock de seguridad
         //Voy a suponer momentáneamente Z = 1.65 (98%)
         //L será por días
 
-        float Z = 1.65f;
-        int L = parametros.get("L") == null? 1 : (int) parametros.get("L");
-        int T = parametros.get("T") == null? 1 : (int) parametros.get("T");
-        Long idArticulo = parametros.get("idArticulo") == null? 0 : (Long) parametros.get("idArticulo");
-        float stockSeguridad = 0;
+        float Z = dtoDatosInventario.getZ();
+        int L = dtoDatosInventario.getL();
+        int T = dtoDatosInventario.getT();
+        Long idArticulo = dtoDatosInventario.getIdArticulo();
+
+        float stockSeguridad;
         float varianza;
         float desviacionEstandar;
 
-        //Obtener demanda promedio
+
+        List<Integer> ventasPorDia = new ArrayList<>();
+        int ventasTotales = 0;
         LocalDate fechaActual = LocalDate.now();
-
-        float demandaPromedio = 0;
-        int[] ventasTotales = {0};
-        int[] ventasPorDia = {0};
-
+        fechaActual = fechaActual.minusDays(L);
         for (int i = 0; i < L; i++) {
-            fechaActual = fechaActual.minusDays(5);
 
             List<Venta> ventasList = ventaRepository.findByFecha(fechaActual);
+            int ventasDelDia = 0;
 
-            int[] ventasDelDia = {0};
+            for (Venta venta : ventasList) {
+                ventasDelDia += venta.getCantidad();
+            }
 
-            ventasList.forEach(venta -> {
-                ventasTotales[0] += venta.getCantidad();
-                ventasDelDia[0] = venta.getCantidad();
-            });
+            fechaActual = fechaActual.plusDays(1);
 
-            ventasPorDia[i] = ventasDelDia[0];
+            ventasTotales += ventasDelDia;
+            ventasPorDia.add(ventasDelDia);
         }
 
+        System.out.println("Ventas totales: " + ventasTotales);
+
         //Promedio de demanda
-        demandaPromedio = (float) (demandaPromedio / L);
+        float demandaPromedio = ventasTotales / L;
 
         //Varianza
         float sumatoria = 0;
         for (int j = 0; j < L; j++) {
-            sumatoria += (float) Math.pow(ventasPorDia[j] - demandaPromedio, 2);
+            sumatoria += (float) Math.pow(ventasPorDia.get(j) - demandaPromedio, 2);
         }
         varianza = sumatoria / (L-1);
 
@@ -86,6 +90,13 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
 
         //Ahora calculamos q
         int q = Math.round(demandaPromedio*(T+L) + stockSeguridad - inventarioActual);
+
+        DTODatosInventarioOutput dtoDatosInventarioOutput = new DTODatosInventarioOutput();
+        dtoDatosInventarioOutput.setQ(q);
+        dtoDatosInventarioOutput.setROP(ROP);
+        dtoDatosInventarioOutput.setStockSeguridad(stockSeguridad);
+
+        return dtoDatosInventarioOutput;
 
     }
 

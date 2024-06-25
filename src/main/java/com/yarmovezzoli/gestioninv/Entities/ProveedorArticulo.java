@@ -17,22 +17,16 @@ import lombok.Setter;
 public class ProveedorArticulo extends Base{
 
     @Column(name = "demora_promedio")
-    private Double demoraPromedio;
-
-    @Column(name = "punto_pedido")
-    private Long puntoPedido;
+    private int demoraPromedio;
 
     @Column(name = "costo_pedido")
-    private Double costoPedido;
-
-    @Column(name = "stock_seguridad")
-    private Double stockSeguridad;
+    private float costoPedido;
 
     @Column(name = "eoq")
-    private Long EOQ;
+    private int EOQ;
 
-    @Column(name = "demanda")
-    private Long demanda;
+    @Column(name = "tiempo_periodo_revision")
+    private int tiempoPeriodoRevision;
 
     @Column(name = "cgi")
     private Double CGI;
@@ -47,22 +41,6 @@ public class ProveedorArticulo extends Base{
 
     @ManyToOne
     @JoinColumn(name = "estado_proveedor_articulo_id")
-    private EstadoProveedorArticulo estadoActual;
-
-    public void calcularEOQ(Double cp, Double ca, Long D){
-        this.EOQ = Math.round(Math.sqrt((2*D*cp)/ca));
-    }
-
-    public void calcularPuntoPedido(Long D, Double demoraPromedio){
-            this.puntoPedido = Math.round(D * demoraPromedio);
-    }
-    public void calcularCGI(Double cp, Double ca, Long D, Double P, Long Q){
-        this.CGI = (P * Q) + (cp * D) + (ca * Q/2);
-    }
-
-    public void calcularStockSeguridad(Double desviacionEstandarDemanda, Double demoraPromedio){
-        float z = 1.68f;
-        this.stockSeguridad = z * desviacionEstandarDemanda * Math.sqrt(demoraPromedio);
-    }
+    private EstadoProveedorArticulo estadoActual;   //Cambiar por el enum
 
 }

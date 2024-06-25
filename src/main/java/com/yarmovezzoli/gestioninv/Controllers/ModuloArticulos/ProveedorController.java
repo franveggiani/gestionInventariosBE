@@ -4,6 +4,7 @@ import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorArticuloRequest;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorDTO;
 import com.yarmovezzoli.gestioninv.Controllers.BaseControllerImpl;
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorRequest;
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Services.ModuloInventarios.ProveedorServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +58,9 @@ public class ProveedorController extends BaseControllerImpl<Proveedor, Proveedor
     }
 
     @PostMapping("/crearProveedorArticulo")
-    public ResponseEntity<?> crearProveedorArticulo(@RequestBody CrearProveedorArticuloRequest crearProveedorArticuloRequest){
+    public ResponseEntity<?> crearProveedorArticulo(@RequestBody DTODatosInventario dtoDatosInventario){
         try{
-            return ResponseEntity.status(HttpStatus.OK).body(service.crearProveedorArticulo(crearProveedorArticuloRequest));
+            return ResponseEntity.status(HttpStatus.OK).body(service.crearProveedorArticulo(dtoDatosInventario));
         }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
         }

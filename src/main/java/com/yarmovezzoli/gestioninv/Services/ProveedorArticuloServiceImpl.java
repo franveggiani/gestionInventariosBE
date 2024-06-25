@@ -43,7 +43,7 @@ public class ProveedorArticuloServiceImpl extends BaseServiceImpl<ProveedorArtic
         Proveedor proveedor = proveedorOptional.get();
 
         proveedorArticulo.setArticulo(articulo);
-        proveedorArticulo.setDemoraPromedio(crearProveedorArticuloRequest.getDemora());
+        //proveedorArticulo.setDemoraPromedio(crearProveedorArticuloRequest.getDemora());
         proveedorArticulo.setProveedor(proveedor);
 
 
@@ -56,7 +56,7 @@ public class ProveedorArticuloServiceImpl extends BaseServiceImpl<ProveedorArtic
             Optional<ProveedorArticulo> proveedorArticuloOptional = proveedorArticuloRepository.findById(id);
             if (proveedorArticuloOptional.isEmpty()) {
                 ProveedorArticulo proveedorArticulo = proveedorArticuloOptional.get();
-                proveedorArticulo.setDemoraPromedio(editarProveedorArticuloDTO.getDemora());
+                //proveedorArticulo.setDemoraPromedio(editarProveedorArticuloDTO.getDemora());
                 return Optional.ofNullable(proveedorArticuloRepository.save(proveedorArticulo));
             } else {
                 throw new Exception("Proveedor-Articulo no encontrado");
