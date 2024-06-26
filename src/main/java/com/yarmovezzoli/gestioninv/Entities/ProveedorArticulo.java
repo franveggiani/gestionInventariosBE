@@ -14,26 +14,21 @@ import lombok.Setter;
 @Setter
 
 public class ProveedorArticulo extends Base{
+
     @Column(name = "demora_promedio")
-    private Double demoraPromedio;
-
-    @Column(name = "punto_pedido")
-    private Long puntoPedido;
-
-    @Column(name = "stock_seguridad")
-    private int stockSeguridad;
+    private int demoraPromedio;
 
     @Column(name = "costo_pedido")
-    private Double costoPedido;
+    private float costoPedido;
 
-    @Column
-    private Long EOQ;
+    @Column(name = "eoq")
+    private int EOQ;
 
-    @Column
-    private Long demanda;
+    @Column(name = "cgi")
+    private float CGI;
 
-    @Column
-    private Double CGI;
+    @Column(name = "periodo_revision")
+    private int periodoRevision;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
@@ -45,18 +40,6 @@ public class ProveedorArticulo extends Base{
 
     @ManyToOne
     @JoinColumn(name = "estado_proveedor_articulo_id")
-    private EstadoProveedorArticulo estadoActual;
-
-    public void calcularEOQ(Double cp, Double ca, Long D){
-        this.EOQ = Math.round(Math.sqrt((2*D*cp)/ca));
-    }
-
-    public void calcularPuntoPedido(Long D, Double demoraPromedio){
-        this.puntoPedido = Math.round(D * demoraPromedio);
-    }
-
-    public void calcularCGI(Double cp, Double ca, Long D, Double P, Long Q){
-        this.CGI = (P * Q) + (cp * D) + (ca * Q/2);
-    }
+    private EstadoProveedorArticulo estadoActual;   //Cambiar por el enum
 
 }

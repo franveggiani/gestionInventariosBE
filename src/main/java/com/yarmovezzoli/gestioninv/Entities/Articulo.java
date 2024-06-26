@@ -25,6 +25,12 @@ public class Articulo extends Base{
     @Column(name = "nombre")
     private String nombre;
 
+    @Column(name = "stock_seguridad")
+    private int stockSeguridad;
+
+    @Column(name = "puntoPedido")
+    private int puntoPedido;
+
     @Column(name = "stock_actual")
     private int stockActual;
 

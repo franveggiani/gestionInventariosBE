@@ -3,6 +3,8 @@ package com.yarmovezzoli.gestioninv.Services.ModuloInventarios;
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorArticuloRequest;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorDTO;
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorRequest;
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventarioOutput;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Entities.ProveedorArticulo;
 import com.yarmovezzoli.gestioninv.Services.BaseService;
@@ -16,6 +18,5 @@ public interface ProveedorService extends BaseService<Proveedor,Long> {
     public List<Proveedor> mostrarProveedores() throws Exception;
     public Optional<Proveedor> modificarDatosProveedor(Long id, EditarProveedorDTO editarProveedorDTO) throws Exception;
     Proveedor crearProveedor(CrearProveedorRequest crearProveedorRequest) throws Exception;
-    ProveedorArticulo crearProveedorArticulo(CrearProveedorArticuloRequest crearProveedorArticuloRequest) throws Exception;
-
+    ProveedorArticulo crearProveedorArticulo(DTODatosInventario datosInventario) throws Exception;
 }

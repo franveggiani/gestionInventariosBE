@@ -1,21 +1,24 @@
 package com.yarmovezzoli.gestioninv.Services.ModuloInventarios;
 
-import com.yarmovezzoli.gestioninv.DTOs.ArticuloCrearProveedorRequest;
-import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorArticuloRequest;
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorRequest;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorDTO;
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
+import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventarioOutput;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Entities.ProveedorArticulo;
+import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
+import com.yarmovezzoli.gestioninv.Factory.CalculosInventarioFactory;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.BaseRepository;
 import com.yarmovezzoli.gestioninv.Repositories.ProveedorArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.ProveedorRepository;
 import com.yarmovezzoli.gestioninv.Services.BaseServiceImpl;
-import com.yarmovezzoli.gestioninv.Services.ModuloInventarios.ProveedorService;
+import com.yarmovezzoli.gestioninv.Strategy.CalculosInventario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -28,12 +31,15 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
     private ArticuloRepository articuloRepository;
     @Autowired
     private ProveedorArticuloRepository proveedorArticuloRepository;
+    @Autowired
+    private CalculosInventarioFactory calculosInventarioFactory;
 
-    public ProveedorServiceImpl(BaseRepository<Proveedor, Long> baseRepository, ArticuloRepository articuloRepository, ProveedorRepository proveedorRepository, ProveedorArticuloRepository proveedorArticuloRepository) {
+    public ProveedorServiceImpl(BaseRepository<Proveedor, Long> baseRepository, ArticuloRepository articuloRepository, ProveedorRepository proveedorRepository, ProveedorArticuloRepository proveedorArticuloRepository, CalculosInventarioFactory calculosInventarioFactory) {
         super(baseRepository);
         this.articuloRepository = articuloRepository;
         this.proveedorRepository = proveedorRepository;
         this.proveedorArticuloRepository = proveedorArticuloRepository;
+        this.calculosInventarioFactory = calculosInventarioFactory;
     }
 
     @Override
@@ -74,70 +80,82 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
             Proveedor proveedor = new Proveedor();
             proveedor.setNombre(crearProveedorRequest.getNombre());
 
-            if (crearProveedorRequest.getArticulos() != null) {
-                List<ArticuloCrearProveedorRequest> articulos = crearProveedorRequest.getArticulos();
-
-                articulos.forEach(articulo -> {
-
-                    ProveedorArticulo proveedorArticulo = new ProveedorArticulo();
-
-                    //Buscamos el articulo y creamos el proveedorArticulo
-                    //ACÁ USAR EL METODO crearProveedorArticulo() - PROXIMAMENTE
-                    articuloRepository.findById(articulo.getIdArticulo())
-                            .ifPresentOrElse(articulo1 -> {
-                                proveedorArticulo.setArticulo(articulo1);
-                                proveedorArticulo.setProveedor(proveedor);
-                                proveedorArticulo.setDemoraPromedio(articulo.getDemora());
-                                proveedorArticulo.setCostoPedido(articulo.getCostoPedido());
-                                //Setear estado de proveedorArticulo
-                                proveedorArticuloRepository.save(proveedorArticulo);
-                            }, () -> {
-                                throw new NoSuchElementException("El articulo no existe");
-                            });
-                });
-            }
-
             proveedorRepository.save(proveedor);
 
+            if (crearProveedorRequest.getArticulos() != null) {
+
+                List<ProveedorArticulo> proveedorArticuloList = new ArrayList<>();
+                List<DTODatosInventario> articulos = crearProveedorRequest.getArticulos();
+
+                for (DTODatosInventario articulo : articulos) {
+                    articulo.setIdProveedor(0L);
+                    proveedorArticuloList.add(crearProveedorArticulo(articulo));
+                }
+
+                for (ProveedorArticulo proveedorArticulo : proveedorArticuloList) {
+                    proveedorArticulo.setProveedor(proveedor);
+                    proveedorArticuloRepository.save(proveedorArticulo);
+                }
+            }
             return proveedor;
 
         } catch (Exception e) {
             throw new Exception(e.getMessage());
         }
     }
-    @Override
-    public ProveedorArticulo crearProveedorArticulo(CrearProveedorArticuloRequest crearProveedorArticuloRequest) throws Exception {
-        try {
-            Long demanda = crearProveedorArticuloRequest.getDemanda();                                                                  //Agregar al Request opcional de crear proveedor con PA
-            Double costoPedido = crearProveedorArticuloRequest.getCostoPedido();                                                        //Agregado
-            Double demoraPromedio = crearProveedorArticuloRequest.getDemora();                                                          //Agregado
-            Double precioPorUnidad = crearProveedorArticuloRequest.getPrecioPorUnidad();                                                //Esto agregarlo al Request para crear Proveedor con PA
-            Optional<Articulo> articulo = articuloRepository.findById(crearProveedorArticuloRequest.getArticuloId());
-            Optional<Proveedor> proveedor = proveedorRepository.findById(crearProveedorArticuloRequest.getProveedorId());
 
-            if (articulo.isPresent() && proveedor.isPresent()) {                //PENSAR VARIACIÓN PARA EL MODELO DE INTERVALO FIJO
+    @Override
+    public ProveedorArticulo crearProveedorArticulo(DTODatosInventario datosInventario) throws Exception {
+        try {
+            Optional<Articulo> articuloOptional = articuloRepository.findById(datosInventario.getIdArticulo());
+            Optional<Proveedor> proveedorOptional = proveedorRepository.findById(datosInventario.getIdProveedor());
+
+            System.out.println(datosInventario.getL());
+            System.out.println(datosInventario.getZ());
+            System.out.println(datosInventario.getT());
+
+            if (articuloOptional.isPresent()) {
+                ModeloInventario modeloInventario = datosInventario.getModeloInventario();
+
+                CalculosInventario calculosInventario = calculosInventarioFactory.getCalculosInventario(modeloInventario);
+                DTODatosInventarioOutput dtoDatosInventarioOutput = calculosInventario.getDatosInventario(datosInventario);
+
+                Articulo articulo = articuloOptional.get();
+                articulo.setPuntoPedido(dtoDatosInventarioOutput.getROP());
+                articulo.setStockSeguridad((int) dtoDatosInventarioOutput.getStockSeguridad());
+                articulo.setModeloInventario(modeloInventario);
+
+                System.out.println("Articulo: " + articulo.getNombre() + " StockSeguridad: " + dtoDatosInventarioOutput.getStockSeguridad() + " ROP: " + dtoDatosInventarioOutput.getROP());
+
                 ProveedorArticulo proveedorArticulo = new ProveedorArticulo();
 
-                Articulo articulo1 = articulo.get();
-                Proveedor proveedor1 = proveedor.get();
+                if (datosInventario.getIdProveedor()!= 0L && proveedorOptional.isPresent()) {
+                    proveedorArticulo.setProveedor(proveedorOptional.get());
+                } else if (datosInventario.getIdProveedor() == 0L) {
+                    proveedorArticulo.setProveedor(null);
+                } else {
+                    throw new Exception("El proveedor no existe");
+                }
 
-                proveedorArticulo.setArticulo(articulo1);                                                                               //Setear articulo
-                proveedorArticulo.setProveedor(proveedor1);                                                                             //Setear proveedor
-                proveedorArticulo.setDemoraPromedio(demoraPromedio);                                                                    //L
-                proveedorArticulo.setCostoPedido(costoPedido);                                                                          //Cp
-                proveedorArticulo.setDemanda(demanda);                                                                                  //D
+                proveedorArticulo.setArticulo(articulo);
+                proveedorArticulo.setDemoraPromedio(datosInventario.getL());
+                proveedorArticulo.setCostoPedido(datosInventario.getCostoPedido());
+                proveedorArticulo.setEOQ(dtoDatosInventarioOutput.getQ());
+                proveedorArticulo.setCGI(dtoDatosInventarioOutput.getCGI());
 
-                Double costoAlmacenamiento = articulo1.getCostoAlmacenamiento();                                                        //Ca                //Agregar al crear el articulo
+                //proveedorArticulo.setEstadoActual(datosInventario.getEstadoProveedorArticulo());
 
-                proveedorArticulo.calcularEOQ(costoPedido, costoAlmacenamiento, demanda);                                               //EOQ
-                proveedorArticulo.calcularPuntoPedido(demanda, demoraPromedio);                                                         //PP
-                proveedorArticulo.calcularCGI(costoPedido, costoAlmacenamiento, demanda, precioPorUnidad, proveedorArticulo.getEOQ());  //CGI
+                if (modeloInventario.equals(ModeloInventario.INTERVALO_FIJO)){
+                    proveedorArticulo.setPeriodoRevision(datosInventario.getT());
+                }
 
+                articuloRepository.save(articulo);
                 proveedorArticuloRepository.save(proveedorArticulo);
 
                 return proveedorArticulo;
+
             } else {
-                throw new NoSuchElementException("El articulo o el proveedor no existe");
+                throw new NoSuchElementException("El articulo no existe o el proveedor no existe");
             }
 
         }catch (Exception e){
@@ -145,6 +163,5 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
         }
     }
 
-
-    }
+}
 
