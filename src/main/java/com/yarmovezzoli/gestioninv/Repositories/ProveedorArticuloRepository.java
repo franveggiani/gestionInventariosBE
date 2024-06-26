@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface ProveedorArticuloRepository extends BaseRepository<ProveedorArticulo, Long> {
 
-    @Query("SELECT pa.articulo FROM ProveedorArticulo pa WHERE pa.proveedor.id = :proveedorId")
-    List<Articulo> findArticulosByProveedorId(@Param("proveedorId") Long proveedorId);
+    @Query("SELECT pa FROM ProveedorArticulo pa WHERE pa.proveedor.id = :proveedorId")
+    List<ProveedorArticulo> findArticulosByProveedorId(@Param("proveedorId") Long proveedorId);
 }
