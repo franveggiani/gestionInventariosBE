@@ -33,10 +33,19 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
         }
     }
 
-    @GetMapping("prediccionDemanda")
+    @PostMapping("prediccionDemanda")
     public ResponseEntity<?> createDemandaHistorica(@RequestBody PrediccionDemandaRequest prediccionDemandaRequest){
         try {
             return ResponseEntity.status(HttpStatus.OK).body(service.getPrediccionDemanda(prediccionDemandaRequest));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(("{\"error\": \"" + e.getMessage() + "\"}"));
+        }
+    }
+
+    @GetMapping("getPredicciones")
+    public ResponseEntity<?> getPredicciones(@RequestParam(name = "idArticulo") Long idArticulo, @RequestParam(name = "year") int year){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.getPredicciones(idArticulo, year));
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(("{\"error\": \"" + e.getMessage() + "\"}"));
         }

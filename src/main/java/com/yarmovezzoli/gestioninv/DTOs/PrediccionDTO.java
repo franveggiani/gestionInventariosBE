@@ -13,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class PrediccionDTO {
 
-    Double cantidadPredecida;
+    int cantidadPredecida;
     LocalDate fechaDesdePrediccion;
     LocalDate fechaHastaPrediccion;
     LocalDate fechaPrediccionRealizada;

@@ -19,7 +19,7 @@ import java.time.LocalDate;
 public class PrediccionDemanda extends Base{
 
     @Column(name = "prediccion")
-    private Double prediccion;
+    private int prediccion;
 
     @Column(name = "fecha_hora_desde")
     private LocalDate fechaDesde;
@@ -30,8 +30,8 @@ public class PrediccionDemanda extends Base{
     @Column(name = "metodo_prediccion")
     private TipoPrediccion tipoPrediccion;
 
-    @Column(name = "fecha_prediccion_realizada")
-    private LocalDate fechaPrediccionRealizada;
+    @Column(name = "fecha_prediccion")
+    private LocalDate fechaPrediccion;
 
     @ManyToOne(optional = true)
     private Articulo articulo;
