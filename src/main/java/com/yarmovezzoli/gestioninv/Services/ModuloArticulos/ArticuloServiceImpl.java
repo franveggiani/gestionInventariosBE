@@ -1,8 +1,11 @@
 package com.yarmovezzoli.gestioninv.Services.ModuloArticulos;
 
+import com.yarmovezzoli.gestioninv.Entities.DemandaHistorica;
 import com.yarmovezzoli.gestioninv.Enums.EstadoOrden;
 import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
+import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
 import com.yarmovezzoli.gestioninv.Repositories.BaseRepository;
+import com.yarmovezzoli.gestioninv.Repositories.DemandaHistoricaRepository;
 import com.yarmovezzoli.gestioninv.Services.BaseServiceImpl;
 import com.yarmovezzoli.gestioninv.Services.ModuloArticulos.ArticuloService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +17,16 @@ import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ArticuloServiceImpl extends BaseServiceImpl<Articulo, Long> implements ArticuloService {
 
     @Autowired
     private ArticuloRepository articuloRepository;
+
+    @Autowired
+    private DemandaHistoricaRepository demandaHistoricaRepository;
 
     public ArticuloServiceImpl(BaseRepository<Articulo, Long> baseRepository, ArticuloRepository articuloRepository) {
         super(baseRepository);
@@ -67,6 +74,21 @@ public class ArticuloServiceImpl extends BaseServiceImpl<Articulo, Long> impleme
             estadoOrdens.add(EstadoOrden.PENDIENTE);
             estadoOrdens.add(EstadoOrden.RECIBIDO);
             return estadoOrdens;
+        }catch(Exception e){
+            throw new Exception(e.getMessage());
+        }
+
+    }
+
+    public List<DemandaHistorica> getDemandaHistorica(Long articuloId, TipoPeriodo tipoPeriodo) throws Exception {
+        try {
+            Optional<Articulo> articulo = articuloRepository.findById(articuloId);
+            if (articulo.isEmpty()) {
+                throw new Exception("No se encontro el articulo");
+            } else {
+                Articulo articulo1 = articulo.get();
+                return demandaHistoricaRepository.findAllByArticuloYTipoPeriodo(articulo1, tipoPeriodo);
+            }
         }catch(Exception e){
             throw new Exception(e.getMessage());
         }

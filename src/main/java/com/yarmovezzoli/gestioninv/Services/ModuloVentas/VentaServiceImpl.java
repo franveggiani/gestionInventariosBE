@@ -189,7 +189,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 } else if (!tipoPrediccion.equals(TipoPrediccion.PROM_MOVIL_PONDERADO)) {
                     //Elimino primer elemento y agrego el último que va a ser la última predicción
                     arregloCantidades.remove(0);
-                    arregloCantidades.add(prediccionDemandaList.getLast().getPrediccion());
+                    arregloCantidades.add(prediccionDemandaList.get(prediccionDemandaList.size() - 1).getPrediccion());
 
                     //Nueva fecha de predicción
                     fechaInicioPrediccion = fechaInicioPrediccion.plusDays(fechaInicioPrediccion.getMonth().length(false));
