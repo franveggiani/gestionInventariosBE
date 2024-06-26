@@ -162,7 +162,10 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 parametros.put("ponderaciones", prediccionDemandaRequest.getPonderaciones());
             } else if (tipoPrediccion.equals(TipoPrediccion.EXPONENCIAL)){
                 parametros.put("alpha", prediccionDemandaRequest.getAlpha());
+            } else if (tipoPrediccion.equals(TipoPrediccion.EXPONENCIAL)) {
+                parametros.put("alpha", prediccionDemandaRequest.getAlpha());
             }
+
 
             List<Double> arregloCantidades = new ArrayList<>();
             List<DemandaHistorica> demandaHistoricaList = new ArrayList<>();
