@@ -20,5 +20,5 @@ public class ProveedorxArticuloDTO {
     int stockActual;
     EstadoArticulo estadoArticulo;
     ModeloInventario modeloInventario;
-    Double CGI;
+    float CGI;
 }
