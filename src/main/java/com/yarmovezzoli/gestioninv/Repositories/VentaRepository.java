@@ -7,7 +7,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -19,7 +18,13 @@ public interface VentaRepository extends BaseRepository<Venta, Long> {
     @Query(value = "SELECT v FROM Venta v WHERE v.fechaHoraAlta = :fechaParametro")
     List<Venta> findByFecha(@Param("fechaParametro") LocalDate fechaParametro);
 
+    @Query(value = "SELECT v FROM Venta v WHERE v.fechaHoraAlta = :fechaParametro AND articulo = :articulo")
+    List<Venta> findByFechaAndArticulo(@Param("fechaParametro") LocalDate fechaParametro, @Param("articulo") Articulo articulo);
+
     @Query(value = "SELECT v FROM Venta v WHERE YEAR(v.fechaHoraAlta) = :year")
     List<Venta> findByYear(@Param("year") int year);
+
+    @Query(value = "SELECT v FROM Venta v WHERE YEAR(v.fechaHoraAlta) = :year AND articulo = :articulo")
+    List<Venta> findByYearAndArticulo(@Param("year") int year, @Param("articulo") Articulo articulo);
 
 }

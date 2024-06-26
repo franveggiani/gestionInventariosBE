@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -33,15 +32,22 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         int year = dtoDatosInventario.getYear();
         int diasLaborales = dtoDatosInventario.getDiasLaborales();
         float precioUnidad = dtoDatosInventario.getPrecioUnidad();
-
-        //System.out.println(L + ", " + Z + ", " + costoPedido);
-
+        Articulo articulo = new Articulo();
         int stockSeguridad;
         float varianza;
         float desviacionEstandar;
         int demandaAnual;
         int EOQ;
         int ROP;
+
+        //Obtener costo de almacenamiento y el articulo
+        Double costoAlmacenamiento = 0.0;
+        Optional<Articulo> articuloOptional = articuloRepository.findById(idArticulo);
+
+        if (articuloOptional.isPresent()) {
+            articulo = articuloOptional.get();
+            costoAlmacenamiento = articuloOptional.get().getCostoAlmacenamiento();
+        }
 
         //Obtener demanda promedio
         LocalDate fechaActual = LocalDate.now();
@@ -54,8 +60,8 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
 
         for (int i = 0; i < L; i++) {
 
-            //System.out.println(fechaActual);S
-            List<Venta> ventasList = ventaRepository.findByFecha(fechaActual);
+            //System.out.println(fechaActual);
+            List<Venta> ventasList = ventaRepository.findByFechaAndArticulo(fechaActual, articulo);
             int ventasDelDia = 0;
 
             for (Venta venta : ventasList) {
@@ -90,9 +96,8 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         //Stock de seguridad
         stockSeguridad = (int) Math.round(Z * desviacionEstandar * Math.sqrt(L));
 
-        //Calcular EOQ
         //Obteniendo demanda anual
-        List<Venta> listasAnuales = ventaRepository.findByYear(year);
+        List<Venta> listasAnuales = ventaRepository.findByYearAndArticulo(year, articulo);
 
         int[] ventasAnuales = {0};
         listasAnuales.forEach(venta -> {
@@ -100,14 +105,6 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         });
 
         demandaAnual = ventasAnuales[0];
-
-        //Obtener costo de almacenamiento
-
-        Double costoAlmacenamiento = 0.0;
-        Optional<Articulo> articuloOptional = articuloRepository.findById(idArticulo);
-        if (articuloOptional.isPresent()) {
-            costoAlmacenamiento = articuloOptional.get().getCostoAlmacenamiento();
-        }
 
         //Finalmente calculamos EOQ
         EOQ = (int) Math.round(Math.sqrt((2*demandaAnual*costoPedido)/(costoAlmacenamiento)));

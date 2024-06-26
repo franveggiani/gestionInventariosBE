@@ -1,12 +1,10 @@
 package com.yarmovezzoli.gestioninv.Services.ModuloInventarios;
 
-import com.yarmovezzoli.gestioninv.DTOs.ArticuloCrearProveedorRequest;
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorRequest;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorDTO;
 import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
 import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventarioOutput;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
-import com.yarmovezzoli.gestioninv.Entities.EstadoProveedorArticulo;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Entities.ProveedorArticulo;
 import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
@@ -20,6 +18,7 @@ import com.yarmovezzoli.gestioninv.Strategy.CalculosInventario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -81,31 +80,23 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
             Proveedor proveedor = new Proveedor();
             proveedor.setNombre(crearProveedorRequest.getNombre());
 
-            if (crearProveedorRequest.getArticulos() != null) {
-                List<ArticuloCrearProveedorRequest> articulos = crearProveedorRequest.getArticulos();
-
-                articulos.forEach(articulo -> {
-
-                    ProveedorArticulo proveedorArticulo = new ProveedorArticulo();
-
-                    //Buscamos el articulo y creamos el proveedorArticulo
-                    //ACÁ USAR EL METODO crearProveedorArticulo() - PROXIMAMENTE
-                    articuloRepository.findById(articulo.getIdArticulo())
-                            .ifPresentOrElse(articulo1 -> {
-                                proveedorArticulo.setArticulo(articulo1);
-                                proveedorArticulo.setProveedor(proveedor);
-//                                proveedorArticulo.setDemoraPromedio(articulo.getDemora());
-//                                proveedorArticulo.setCostoPedido(articulo.getCostoPedido());
-                                //Setear estado de proveedorArticulo
-                                proveedorArticuloRepository.save(proveedorArticulo);
-                            }, () -> {
-                                throw new NoSuchElementException("El articulo no existe");
-                            });
-                });
-            }
-
             proveedorRepository.save(proveedor);
 
+            if (crearProveedorRequest.getArticulos() != null) {
+
+                List<ProveedorArticulo> proveedorArticuloList = new ArrayList<>();
+                List<DTODatosInventario> articulos = crearProveedorRequest.getArticulos();
+
+                for (DTODatosInventario articulo : articulos) {
+                    articulo.setIdProveedor(0L);
+                    proveedorArticuloList.add(crearProveedorArticulo(articulo));
+                }
+
+                for (ProveedorArticulo proveedorArticulo : proveedorArticuloList) {
+                    proveedorArticulo.setProveedor(proveedor);
+                    proveedorArticuloRepository.save(proveedorArticulo);
+                }
+            }
             return proveedor;
 
         } catch (Exception e) {
@@ -116,7 +107,6 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
     @Override
     public ProveedorArticulo crearProveedorArticulo(DTODatosInventario datosInventario) throws Exception {
         try {
-
             Optional<Articulo> articuloOptional = articuloRepository.findById(datosInventario.getIdArticulo());
             Optional<Proveedor> proveedorOptional = proveedorRepository.findById(datosInventario.getIdProveedor());
 
@@ -124,7 +114,7 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
             System.out.println(datosInventario.getZ());
             System.out.println(datosInventario.getT());
 
-            if (articuloOptional.isPresent() && proveedorOptional.isPresent()) {
+            if (articuloOptional.isPresent()) {
                 ModeloInventario modeloInventario = datosInventario.getModeloInventario();
 
                 CalculosInventario calculosInventario = calculosInventarioFactory.getCalculosInventario(modeloInventario);
@@ -135,9 +125,19 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
                 articulo.setStockSeguridad((int) dtoDatosInventarioOutput.getStockSeguridad());
                 articulo.setModeloInventario(modeloInventario);
 
+                System.out.println("Articulo: " + articulo.getNombre() + " StockSeguridad: " + dtoDatosInventarioOutput.getStockSeguridad() + " ROP: " + dtoDatosInventarioOutput.getROP());
+
                 ProveedorArticulo proveedorArticulo = new ProveedorArticulo();
+
+                if (datosInventario.getIdProveedor()!= 0L && proveedorOptional.isPresent()) {
+                    proveedorArticulo.setProveedor(proveedorOptional.get());
+                } else if (datosInventario.getIdProveedor() == 0L) {
+                    proveedorArticulo.setProveedor(null);
+                } else {
+                    throw new Exception("El proveedor no existe");
+                }
+
                 proveedorArticulo.setArticulo(articulo);
-                proveedorArticulo.setProveedor(proveedorOptional.get());
                 proveedorArticulo.setDemoraPromedio(datosInventario.getL());
                 proveedorArticulo.setCostoPedido(datosInventario.getCostoPedido());
                 proveedorArticulo.setEOQ(dtoDatosInventarioOutput.getQ());
@@ -146,7 +146,7 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
                 //proveedorArticulo.setEstadoActual(datosInventario.getEstadoProveedorArticulo());
 
                 if (modeloInventario.equals(ModeloInventario.INTERVALO_FIJO)){
-                    proveedorArticulo.setTiempoPeriodoRevision(datosInventario.getT());
+                    proveedorArticulo.setPeriodoRevision(datosInventario.getT());
                 }
 
                 articuloRepository.save(articulo);

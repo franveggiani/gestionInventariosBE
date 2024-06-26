@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -33,11 +32,23 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
         int L = dtoDatosInventario.getL();
         int T = dtoDatosInventario.getT();
         Long idArticulo = dtoDatosInventario.getIdArticulo();
-
+        float precioUnidad = dtoDatosInventario.getPrecioUnidad();
+        float costoPedido = dtoDatosInventario.getCostoPedido();
+        int year = dtoDatosInventario.getYear();
+        Double costoAlmacenamiento = 0.0;
+        Articulo articulo = new Articulo();
+        int inventarioActual = 0;
         float stockSeguridad;
         float varianza;
         float desviacionEstandar;
+        int demandaAnual;
 
+        Optional<Articulo> articuloOptional = articuloRepository.findById(idArticulo);
+        if (articuloOptional.isPresent()) {
+            articulo = articuloOptional.get();
+            inventarioActual = articulo.getStockActual();
+            costoAlmacenamiento = articulo.getCostoAlmacenamiento();
+        }
 
         List<Integer> ventasPorDia = new ArrayList<>();
         int ventasTotales = 0;
@@ -45,7 +56,7 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
         fechaActual = fechaActual.minusDays(L);
         for (int i = 0; i < L; i++) {
 
-            List<Venta> ventasList = ventaRepository.findByFecha(fechaActual);
+            List<Venta> ventasList = ventaRepository.findByFechaAndArticulo(fechaActual, articulo);
             int ventasDelDia = 0;
 
             for (Venta venta : ventasList) {
@@ -79,17 +90,21 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
         //Ahora calculamos el ROP
         int ROP = (int) (demandaPromedio * (T+L) + stockSeguridad);
 
-        Optional<Articulo> articuloOptional = articuloRepository.findById(idArticulo);
+        //Obteniendo demanda anual
+        List<Venta> listasAnuales = ventaRepository.findByYearAndArticulo(year, articulo);
 
-        int inventarioActual;
-        if (articuloOptional.isPresent()) {
-            inventarioActual = articuloOptional.get().getStockActual();
-        } else {
-            throw new IllegalArgumentException("No se encontró el artículo");
-        }
+        int[] ventasAnuales = {0};
+        listasAnuales.forEach(venta -> {
+            ventasAnuales[0] += venta.getCantidad();
+        });
+
+        demandaAnual = ventasAnuales[0];
 
         //Ahora calculamos q
         int q = Math.round(demandaPromedio*(T+L) + stockSeguridad - inventarioActual);
+
+        //Calculamos CGI
+        float CGI = (float) (precioUnidad * q + costoAlmacenamiento * (q/2) + costoPedido * demandaAnual/q);
 
         DTODatosInventarioOutput dtoDatosInventarioOutput = new DTODatosInventarioOutput();
         dtoDatosInventarioOutput.setQ(q);

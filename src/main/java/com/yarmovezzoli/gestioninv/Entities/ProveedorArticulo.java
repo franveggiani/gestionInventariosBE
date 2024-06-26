@@ -1,6 +1,5 @@
 package com.yarmovezzoli.gestioninv.Entities;
 
-import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,11 +24,11 @@ public class ProveedorArticulo extends Base{
     @Column(name = "eoq")
     private int EOQ;
 
-    @Column(name = "tiempo_periodo_revision")
-    private int tiempoPeriodoRevision;
-
     @Column(name = "cgi")
     private float CGI;
+
+    @Column(name = "periodo_revision")
+    private int periodoRevision;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
