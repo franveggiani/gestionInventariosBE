@@ -9,7 +9,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DTODatosInventario {
-
     @JsonProperty("L")
     private int L;
     @JsonProperty("T")
@@ -24,13 +23,7 @@ public class DTODatosInventario {
     private float costoPedido;
     @JsonProperty("year")
     private int year;
-    @JsonProperty("diasLaborales")
-    private int diasLaborales;
-    @JsonProperty("modeloInventario")
-    private ModeloInventario modeloInventario;
     @JsonProperty("precioUnidad")
     private float precioUnidad;
 
-//    @JsonProperty("estadoArticulo")
-//    private EstadoProveedorArticulo estadoProveedorArticulo;
 }

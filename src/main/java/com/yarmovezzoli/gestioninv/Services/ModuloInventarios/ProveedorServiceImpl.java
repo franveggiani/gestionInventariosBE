@@ -115,12 +115,12 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
             System.out.println(datosInventario.getT());
 
             if (articuloOptional.isPresent()) {
-                ModeloInventario modeloInventario = datosInventario.getModeloInventario();
+                Articulo articulo = articuloOptional.get();
+                ModeloInventario modeloInventario = articulo.getModeloInventario();
 
                 CalculosInventario calculosInventario = calculosInventarioFactory.getCalculosInventario(modeloInventario);
                 DTODatosInventarioOutput dtoDatosInventarioOutput = calculosInventario.getDatosInventario(datosInventario);
 
-                Articulo articulo = articuloOptional.get();
                 articulo.setPuntoPedido(dtoDatosInventarioOutput.getROP());
                 articulo.setStockSeguridad((int) dtoDatosInventarioOutput.getStockSeguridad());
                 articulo.setModeloInventario(modeloInventario);
@@ -192,7 +192,6 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
                 DTODatosInventario datosInventario = new DTODatosInventario();
                 datosInventario.setIdArticulo(articulo.getId());
                 datosInventario.setIdProveedor(proveedorArticulo.getProveedor().getId());
-                datosInventario.setModeloInventario(modeloInventario);
                 datosInventario.setL(proveedorArticulo.getDemoraPromedio());
                 datosInventario.setCostoPedido(proveedorArticulo.getCostoPedido());
                 datosInventario.setYear(proveedorArticulo.getYear());
