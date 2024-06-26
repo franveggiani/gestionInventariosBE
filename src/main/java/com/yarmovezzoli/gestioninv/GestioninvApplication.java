@@ -3,6 +3,7 @@ package com.yarmovezzoli.gestioninv;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
+import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.ProveedorRepository;
 import com.yarmovezzoli.gestioninv.Repositories.VentaRepository;
@@ -53,6 +54,7 @@ public class GestioninvApplication {
 			articulo1.setNombre("Palo de escoba");
 			articulo1.setStockActual(34);
 			articulo1.setCostoAlmacenamiento(Double.valueOf(50));
+			articulo1.setModeloInventario(ModeloInventario.INTERVALO_FIJO);
 			articuloList.add(articulo1);
 
 			Articulo articulo2 = new Articulo();
@@ -60,6 +62,7 @@ public class GestioninvApplication {
 			articulo2.setNombre("Tractor Challenger MT875E");
 			articulo2.setStockActual(100);
 			articulo2.setCostoAlmacenamiento(Double.valueOf(1000));
+			articulo2.setModeloInventario(ModeloInventario.INTERVALO_FIJO);
 			articuloList.add(articulo2);
 
 			Articulo articulo3 = new Articulo();
@@ -67,6 +70,7 @@ public class GestioninvApplication {
 			articulo3.setNombre("Coche Alfa Romeo 148 2012");
 			articulo3.setStockActual(10);
 			articulo3.setCostoAlmacenamiento(Double.valueOf(1500));
+			articulo3.setModeloInventario(ModeloInventario.INTERVALO_FIJO);
 			articuloList.add(articulo3);
 
 			articuloRepository.save(articulo1);

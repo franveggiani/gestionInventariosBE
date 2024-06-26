@@ -30,7 +30,6 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         Long idArticulo = dtoDatosInventario.getIdArticulo();
         float costoPedido = dtoDatosInventario.getCostoPedido();
         int year = dtoDatosInventario.getYear();
-        int diasLaborales = dtoDatosInventario.getDiasLaborales();
         float precioUnidad = dtoDatosInventario.getPrecioUnidad();
         Articulo articulo = new Articulo();
         int stockSeguridad;
@@ -99,12 +98,12 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         //Obteniendo demanda anual
         List<Venta> listasAnuales = ventaRepository.findByYearAndArticulo(year, articulo);
 
-        int[] ventasAnuales = {0};
-        listasAnuales.forEach(venta -> {
-            ventasAnuales[0] += venta.getCantidad();
-        });
+        int ventasAnuales = 0;
+        for (Venta venta : listasAnuales) {
+            ventasAnuales += venta.getCantidad();
+        }
 
-        demandaAnual = ventasAnuales[0];
+        demandaAnual = ventasAnuales;
 
         //Finalmente calculamos EOQ
         EOQ = (int) Math.round(Math.sqrt((2*demandaAnual*costoPedido)/(costoAlmacenamiento)));
