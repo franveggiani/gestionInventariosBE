@@ -117,8 +117,6 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
     public ProveedorArticulo crearProveedorArticulo(DTODatosInventario datosInventario) throws Exception {
         try {
 
-            ModeloInventario modeloInventario = datosInventario.getModeloInventario();
-
             Optional<Articulo> articuloOptional = articuloRepository.findById(datosInventario.getIdArticulo());
             Optional<Proveedor> proveedorOptional = proveedorRepository.findById(datosInventario.getIdProveedor());
 
@@ -127,6 +125,8 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
             System.out.println(datosInventario.getT());
 
             if (articuloOptional.isPresent() && proveedorOptional.isPresent()) {
+                ModeloInventario modeloInventario = datosInventario.getModeloInventario();
+
                 CalculosInventario calculosInventario = calculosInventarioFactory.getCalculosInventario(modeloInventario);
                 DTODatosInventarioOutput dtoDatosInventarioOutput = calculosInventario.getDatosInventario(datosInventario);
 
@@ -141,6 +141,7 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
                 proveedorArticulo.setDemoraPromedio(datosInventario.getL());
                 proveedorArticulo.setCostoPedido(datosInventario.getCostoPedido());
                 proveedorArticulo.setEOQ(dtoDatosInventarioOutput.getQ());
+                proveedorArticulo.setCGI(dtoDatosInventarioOutput.getCGI());
 
                 //proveedorArticulo.setEstadoActual(datosInventario.getEstadoProveedorArticulo());
 

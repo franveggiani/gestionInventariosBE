@@ -28,6 +28,9 @@ public class DTODatosInventario {
     private int diasLaborales;
     @JsonProperty("modeloInventario")
     private ModeloInventario modeloInventario;
+    @JsonProperty("precioUnidad")
+    private float precioUnidad;
+
 //    @JsonProperty("estadoArticulo")
 //    private EstadoProveedorArticulo estadoProveedorArticulo;
 }

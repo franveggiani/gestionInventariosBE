@@ -32,6 +32,7 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         float costoPedido = dtoDatosInventario.getCostoPedido();
         int year = dtoDatosInventario.getYear();
         int diasLaborales = dtoDatosInventario.getDiasLaborales();
+        float precioUnidad = dtoDatosInventario.getPrecioUnidad();
 
         //System.out.println(L + ", " + Z + ", " + costoPedido);
 
@@ -103,11 +104,9 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         //Obtener costo de almacenamiento
 
         Double costoAlmacenamiento = 0.0;
-
         Optional<Articulo> articuloOptional = articuloRepository.findById(idArticulo);
         if (articuloOptional.isPresent()) {
             costoAlmacenamiento = articuloOptional.get().getCostoAlmacenamiento();
-            System.out.println(costoAlmacenamiento);
         }
 
         //Finalmente calculamos EOQ
@@ -116,11 +115,15 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         //Calculando ROP (o PP)
         ROP = (int) demandaPromedio * L + stockSeguridad;
 
+        //Calculamos CGI
+        float CGI = (float) (precioUnidad * EOQ + costoAlmacenamiento * (EOQ/2) + costoPedido * demandaAnual/EOQ);
+
         DTODatosInventarioOutput dtoDatosInventarioOutput = new DTODatosInventarioOutput();
 
         dtoDatosInventarioOutput.setStockSeguridad(stockSeguridad);
         dtoDatosInventarioOutput.setQ(EOQ);
         dtoDatosInventarioOutput.setROP(ROP);
+        dtoDatosInventarioOutput.setCGI(CGI);
 
         return dtoDatosInventarioOutput;
 

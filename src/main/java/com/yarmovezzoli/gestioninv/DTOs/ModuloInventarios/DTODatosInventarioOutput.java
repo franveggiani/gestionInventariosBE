@@ -10,5 +10,6 @@ public class DTODatosInventarioOutput {
     float stockSeguridad;
     int ROP;
     int q;
+    float CGI;
 
 }

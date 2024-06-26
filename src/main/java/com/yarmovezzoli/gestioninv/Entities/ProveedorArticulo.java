@@ -29,7 +29,7 @@ public class ProveedorArticulo extends Base{
     private int tiempoPeriodoRevision;
 
     @Column(name = "cgi")
-    private Double CGI;
+    private float CGI;
 
     @ManyToOne
     @JoinColumn(name = "articulo_id")
