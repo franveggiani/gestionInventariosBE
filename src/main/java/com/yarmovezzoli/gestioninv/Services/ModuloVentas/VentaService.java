@@ -5,6 +5,7 @@ import com.yarmovezzoli.gestioninv.DTOs.PrediccionDTO;
 import com.yarmovezzoli.gestioninv.DTOs.PrediccionDemandaRequest;
 import com.yarmovezzoli.gestioninv.DTOs.VentaRequestDTO;
 import com.yarmovezzoli.gestioninv.Entities.DemandaHistorica;
+import com.yarmovezzoli.gestioninv.Entities.PrediccionDemanda;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
 import com.yarmovezzoli.gestioninv.Services.BaseService;
 
@@ -19,4 +20,5 @@ public interface VentaService extends BaseService<Venta, Long> {
 
     public List<PrediccionDTO> getPrediccionDemanda(PrediccionDemandaRequest prediccionDemandaRequest) throws Exception;
 
+    List<PrediccionDemanda> getPredicciones(Long idArticulo, int year) throws Exception;
 }

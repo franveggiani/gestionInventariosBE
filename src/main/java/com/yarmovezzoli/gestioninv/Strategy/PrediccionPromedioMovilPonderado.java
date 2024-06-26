@@ -13,22 +13,22 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
     public PrediccionDemanda predecirDemanda(Map<String, Object> parametros) {
 
         Double[] ponderaciones = (Double[]) parametros.get("ponderaciones");
-        List<Double> arregloCantidades = (List<Double>) parametros.get("arregloCantidades");
+        List<Integer> arregloCantidades = (List<Integer>) parametros.get("arregloCantidades");
 
-        float[] denominador = {0};
-        float[] numerador = {0};
-        float promedioPonderado;
+        float denominador = 0;
+        float numerador = 0;
+        int promedioPonderado;
 
         if (ponderaciones.length!= arregloCantidades.size()){
             throw new IllegalArgumentException("El tamaño de las ponderaciones y el arreglo de cantidades no coinciden");
         } else {
             for (int i = 0; i < ponderaciones.length; i++) {
-                numerador[0] += ponderaciones[i] * arregloCantidades.get(i);
-                denominador[0] += ponderaciones[i];
-                System.out.println(ponderaciones[i]);
-                System.out.println(arregloCantidades.get(i));
+                numerador += (float) (ponderaciones[i] * arregloCantidades.get(i));
+                denominador += ponderaciones[i];
+//                System.out.println(ponderaciones[i]);
+//                System.out.println(arregloCantidades.get(i));
             }
-            promedioPonderado = numerador[0] / denominador[0];
+            promedioPonderado = Math.round(numerador / denominador);
         }
 
         Articulo articulo = (Articulo) parametros.get("articulo");
@@ -40,7 +40,7 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
         prediccion.setArticulo(articulo);
         prediccion.setFechaDesde(fechaDesdePrediccion);
         prediccion.setFechaHasta(fechaHastaPrediccion);
-        prediccion.setPrediccion(Double.valueOf(promedioPonderado));
+        prediccion.setPrediccion(promedioPonderado);
 
         return prediccion;
     }

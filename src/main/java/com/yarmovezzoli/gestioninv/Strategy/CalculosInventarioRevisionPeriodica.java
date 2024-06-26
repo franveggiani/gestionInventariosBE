@@ -3,12 +3,15 @@ package com.yarmovezzoli.gestioninv.Strategy;
 import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
 import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventarioOutput;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
+import com.yarmovezzoli.gestioninv.Entities.ProveedorArticulo;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
+import com.yarmovezzoli.gestioninv.Repositories.ProveedorArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.VentaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +24,8 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
     VentaRepository ventaRepository;
     @Autowired
     ArticuloRepository articuloRepository;
+    @Autowired
+    private ProveedorArticuloRepository proveedorArticuloRepository;
 
     public DTODatosInventarioOutput getDatosInventario(DTODatosInventario dtoDatosInventario) { //Cambiar el void después
 
@@ -114,5 +119,7 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
         return dtoDatosInventarioOutput;
 
     }
+
+
 
 }
