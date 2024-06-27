@@ -3,10 +3,12 @@ package com.yarmovezzoli.gestioninv.DTOs;
 import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
 import com.yarmovezzoli.gestioninv.Enums.TipoPrediccion;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Getter
+@Setter
 public class PrediccionDemandaRequest {
 
     private int numeroPeriodos;
