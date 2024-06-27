@@ -51,4 +51,13 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
         }
     }
 
+    @GetMapping("/articulos/{articuloId}")
+    public ResponseEntity<?> getVentasPorArticulo(@PathVariable Long articuloId){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.getVentasPorArticulo(articuloId));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(("{\"error\": \"" + e.getMessage() + "\"}"));
+        }
+    }
+
 }

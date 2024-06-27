@@ -247,4 +247,20 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
         }
     }
 
+    @Override
+    public List<Venta> getVentasPorArticulo(Long articuloId) throws Exception {
+        try {
+            Optional<Articulo> articuloOptional = articuloRepository.findById(articuloId);
+
+            if (articuloOptional.isPresent()){
+                Articulo articulo = articuloOptional.get();
+                return ventaRepository.findByArticulo(articulo);
+            }  else {
+                throw new Exception("Error: El artículo requerido no ha sido encontrado");
+            }
+        } catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+
 }
