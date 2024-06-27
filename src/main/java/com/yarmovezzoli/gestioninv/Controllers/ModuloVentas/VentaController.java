@@ -36,7 +36,7 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
     @PostMapping("prediccionDemanda")
     public ResponseEntity<?> createDemandaHistorica(@RequestBody PrediccionDemandaRequest prediccionDemandaRequest){
         try {
-            return ResponseEntity.status(HttpStatus.OK).body(service.getPrediccionDemanda(prediccionDemandaRequest));
+            return ResponseEntity.status(HttpStatus.OK).body(service.calcularPrediccionDemanda(prediccionDemandaRequest));
         } catch (Exception e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(("{\"error\": \"" + e.getMessage() + "\"}"));
         }

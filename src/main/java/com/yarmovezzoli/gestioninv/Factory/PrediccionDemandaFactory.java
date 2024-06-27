@@ -4,8 +4,16 @@ import com.yarmovezzoli.gestioninv.Enums.TipoPrediccion;
 import com.yarmovezzoli.gestioninv.Strategy.PrediccionDemandaStrategy;
 import com.yarmovezzoli.gestioninv.Strategy.PrediccionPromedioMovil;
 import com.yarmovezzoli.gestioninv.Strategy.PrediccionPromedioMovilPonderado;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PrediccionDemandaFactory {
+
+    @Autowired
+    private ApplicationContext applicationContext;
+
     private static PrediccionDemandaFactory instance;
 
     public PrediccionDemandaFactory() {
@@ -20,9 +28,9 @@ public class PrediccionDemandaFactory {
 
     public PrediccionDemandaStrategy getPrediccionDemandaStrategy(TipoPrediccion tipoPrediccion){
         if (tipoPrediccion.equals(TipoPrediccion.PROM_MOVIL)){
-            return new PrediccionPromedioMovil();
+            return applicationContext.getBean(PrediccionPromedioMovil.class);
         } else if (tipoPrediccion.equals(TipoPrediccion.PROM_MOVIL_PONDERADO)){
-            return new PrediccionPromedioMovilPonderado();
+            return applicationContext.getBean(PrediccionPromedioMovilPonderado.class);
         }
         {
             throw new Error("No existe este tipo de predicción");

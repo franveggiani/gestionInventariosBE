@@ -1,47 +1,89 @@
 package com.yarmovezzoli.gestioninv.Strategy;
 
+import com.yarmovezzoli.gestioninv.DTOs.PrediccionDemandaRequest;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.PrediccionDemanda;
+import com.yarmovezzoli.gestioninv.Entities.Venta;
+import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
+import com.yarmovezzoli.gestioninv.Enums.TipoPrediccion;
+import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
+import com.yarmovezzoli.gestioninv.Repositories.VentaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrategy{
 
-    @Override
-    public PrediccionDemanda predecirDemanda(Map<String, Object> parametros) {
+    @Autowired
+    ArticuloRepository articuloRepository;
+    @Autowired
+    VentaRepository ventaRepository;
 
-        Double[] ponderaciones = (Double[]) parametros.get("ponderaciones");
-        List<Integer> arregloCantidades = (List<Integer>) parametros.get("arregloCantidades");
+    @Override
+    public List<PrediccionDemanda> predecirDemanda(PrediccionDemandaRequest prediccionDemandaRequest) {
+
+        LocalDate fechaInicioPrediccion = prediccionDemandaRequest.getFechaDesdePrediccion();
+        TipoPeriodo tipoPeriodo = prediccionDemandaRequest.getTipoPeriodo();
+        Long idArticulo = prediccionDemandaRequest.getArticuloId();
+        Long cantDiasPeriodo = tipoPeriodo.getDias();
+        Articulo articulo = articuloRepository.findById(idArticulo).orElse(null);
+        int numeroPeriodos = prediccionDemandaRequest.getNumeroPeriodos();
+        Double[] ponderaciones = prediccionDemandaRequest.getPonderaciones();
+
+        LocalDate fechaInicioPeriodo = fechaInicioPrediccion.minusDays(cantDiasPeriodo*numeroPeriodos);
+        LocalDate fechaFinPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
+
+        List<Integer> ventasPorPeriodo = new ArrayList<>();
+
+        for (int i = 0; i < ponderaciones.length; i++) {
+
+            List<Venta> ventaList = ventaRepository.findByPeriodoAndArticulo(fechaInicioPeriodo, fechaFinPeriodo, articulo);
+
+            int sumatoria = 0;
+            for (Venta venta : ventaList) {
+                sumatoria += venta.getCantidad();
+            }
+
+            ventasPorPeriodo.add(sumatoria);
+
+            fechaInicioPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
+            fechaFinPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
+        }
 
         float denominador = 0;
         float numerador = 0;
         int promedioPonderado;
-
-        if (ponderaciones.length!= arregloCantidades.size()){
-            throw new IllegalArgumentException("El tamaño de las ponderaciones y el arreglo de cantidades no coinciden");
-        } else {
-            for (int i = 0; i < ponderaciones.length; i++) {
-                numerador += (float) (ponderaciones[i] * arregloCantidades.get(i));
-                denominador += ponderaciones[i];
-//                System.out.println(ponderaciones[i]);
-//                System.out.println(arregloCantidades.get(i));
-            }
-            promedioPonderado = Math.round(numerador / denominador);
+        for (int i = 0; i < ponderaciones.length; i++) {
+            numerador += (float) ventasPorPeriodo.get(i);
+            denominador += ponderaciones[i];
         }
 
-        Articulo articulo = (Articulo) parametros.get("articulo");
-        LocalDate fechaDesdePrediccion = (LocalDate) parametros.get("fechaDesdePrediccion");
-        LocalDate fechaHastaPrediccion = (LocalDate) parametros.get("fechaHastaPrediccion");
+        promedioPonderado = Math.round(numerador / denominador);
 
-        PrediccionDemanda prediccion = new PrediccionDemanda();
+        List<PrediccionDemanda> prediccionDemandaList = new ArrayList<>();
 
-        prediccion.setArticulo(articulo);
-        prediccion.setFechaDesde(fechaDesdePrediccion);
-        prediccion.setFechaHasta(fechaHastaPrediccion);
-        prediccion.setPrediccion(promedioPonderado);
+        PrediccionDemanda prediccion = crearPrediccionDemanda(promedioPonderado, fechaInicioPrediccion, articulo, cantDiasPeriodo);
 
-        return prediccion;
+        prediccionDemandaList.add(prediccion);
+
+        return prediccionDemandaList;
+    }
+
+    public PrediccionDemanda crearPrediccionDemanda(int prediccion, LocalDate fechaInicioPrediccion, Articulo articulo, Long cantDiasPeriodo) {
+        PrediccionDemanda prediccionDemanda = new PrediccionDemanda();
+
+        prediccionDemanda.setPrediccion(prediccion);
+        prediccionDemanda.setTipoPrediccion(TipoPrediccion.PROM_MOVIL_PONDERADO);
+        prediccionDemanda.setFechaPrediccion(LocalDate.now());
+        prediccionDemanda.setFechaDesde(fechaInicioPrediccion);
+        prediccionDemanda.setFechaHasta(fechaInicioPrediccion.plusDays(cantDiasPeriodo));
+        prediccionDemanda.setArticulo(articulo);
+
+        return prediccionDemanda;
     }
 }
