@@ -65,4 +65,13 @@ public class ProveedorController extends BaseControllerImpl<Proveedor, Proveedor
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
+
+    @PutMapping("/proveedorPredeterminado/{idProveedorArticulo}")
+    public ResponseEntity<?> proveedorPredeterminado(@PathVariable Long idProveedorArticulo) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.setPAPredeterminado(idProveedorArticulo));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
 }

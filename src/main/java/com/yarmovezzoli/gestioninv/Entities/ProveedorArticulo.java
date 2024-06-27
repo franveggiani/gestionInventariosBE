@@ -30,6 +30,15 @@ public class ProveedorArticulo extends Base{
     @Column(name = "periodo_revision")
     private int periodoRevision;
 
+    @Column(name = "precio_por_unidad")
+    private float precioPorUnidad;
+
+    @Column(name = "nivel_de_servicio")
+    private float nivelDeServicio;
+
+    @Column(name = "anio_demanda_anual")
+    private int year;
+
     @ManyToOne
     @JoinColumn(name = "articulo_id")
     private Articulo articulo;
@@ -38,8 +47,7 @@ public class ProveedorArticulo extends Base{
     @JoinColumn(name = "proveedor_id")
     private Proveedor proveedor;
 
-    @ManyToOne
-    @JoinColumn(name = "estado_proveedor_articulo_id")
-    private EstadoProveedorArticulo estadoActual;   //Cambiar por el enum
+    @Column(name = "es_predeterminado")
+    private boolean esPredeterminado;
 
 }

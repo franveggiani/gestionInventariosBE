@@ -42,4 +42,22 @@ public class VentaController extends BaseControllerImpl<Venta, VentaServiceImpl>
         }
     }
 
+    @GetMapping("getPredicciones")
+    public ResponseEntity<?> getPredicciones(@RequestParam(name = "idArticulo") Long idArticulo, @RequestParam(name = "year") int year){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.getPredicciones(idArticulo, year));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(("{\"error\": \"" + e.getMessage() + "\"}"));
+        }
+    }
+
+    @GetMapping("/articulos/{articuloId}")
+    public ResponseEntity<?> getVentasPorArticulo(@PathVariable Long articuloId){
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.getVentasPorArticulo(articuloId));
+        } catch (Exception e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(("{\"error\": \"" + e.getMessage() + "\"}"));
+        }
+    }
+
 }

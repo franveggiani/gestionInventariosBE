@@ -19,4 +19,6 @@ public interface ProveedorService extends BaseService<Proveedor,Long> {
     public Optional<Proveedor> modificarDatosProveedor(Long id, EditarProveedorDTO editarProveedorDTO) throws Exception;
     Proveedor crearProveedor(CrearProveedorRequest crearProveedorRequest) throws Exception;
     ProveedorArticulo crearProveedorArticulo(DTODatosInventario datosInventario) throws Exception;
+    public ProveedorArticulo setPAPredeterminado(Long idProveedorArticulo) throws Exception;
+
 }

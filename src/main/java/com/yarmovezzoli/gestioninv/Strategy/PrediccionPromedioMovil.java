@@ -1,11 +1,9 @@
 package com.yarmovezzoli.gestioninv.Strategy;
 
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
-import com.yarmovezzoli.gestioninv.Entities.DemandaHistorica;
 import com.yarmovezzoli.gestioninv.Entities.PrediccionDemanda;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -17,26 +15,26 @@ public class PrediccionPromedioMovil implements PrediccionDemandaStrategy {
         Object arregloCantidadesObj = parametros.get("arregloCantidades");
 
         if (arregloCantidadesObj instanceof List<?>){
-            List<Double> arregloCantidades = (List<Double>) arregloCantidadesObj;
+            List<Integer> arregloCantidades = (List<Integer>) arregloCantidadesObj;
 
             Articulo articulo = (Articulo) parametros.get("articulo");
             LocalDate fechaDesdePrediccion = (LocalDate) parametros.get("fechaDesdePrediccion");
             LocalDate fechaHastaPrediccion = (LocalDate) parametros.get("fechaHastaPrediccion");
 
-            double[] sumatoria = {0};
-            int[] n = {0};
+            int sumatoria = 0;
+            int n = 0;
 
-            arregloCantidades.forEach(cantidad ->{
-                sumatoria[0] += cantidad;
-                n[0] += 1;
-                System.out.println(cantidad);
-            });
+            for (Integer cantidad : arregloCantidades) {
+                sumatoria += cantidad;
+                n += 1;
+            }
 
-            Double promedio = sumatoria[0] / n[0];
+            int promedio = Math.round(sumatoria / n);
 
             PrediccionDemanda prediccion = new PrediccionDemanda();
             prediccion.setArticulo(articulo);
-            prediccion.setFechaPrediccionRealizada(LocalDate.now());
+            prediccion.setFechaPrediccion(LocalDate.now());
+            System.out.println(prediccion.getFechaPrediccion());
             prediccion.setFechaDesde(fechaDesdePrediccion);
             prediccion.setFechaHasta(fechaHastaPrediccion);
             prediccion.setPrediccion(promedio);

@@ -2,6 +2,7 @@ package com.yarmovezzoli.gestioninv.Services;
 
 import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorArticuloRequest;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorArticuloDTO;
+import com.yarmovezzoli.gestioninv.DTOs.ProveedorxArticuloDTO;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Entities.ProveedorArticulo;
@@ -12,6 +13,7 @@ import com.yarmovezzoli.gestioninv.Repositories.ProveedorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +68,33 @@ public class ProveedorArticuloServiceImpl extends BaseServiceImpl<ProveedorArtic
         }
 
     @Override
-    public List<Articulo> obtenerArticulosPorProveedor(Long proveedorId) throws Exception {
-        return proveedorArticuloRepository.findArticulosByProveedorId(proveedorId);
+    public List<ProveedorxArticuloDTO> obtenerArticulosPorProveedor(Long proveedorId) throws Exception {
+        List<ProveedorArticulo> proveedorArticulos = proveedorArticuloRepository.findArticulosByProveedorId(proveedorId);
+
+        if (proveedorArticulos.isEmpty()) {
+            throw new Exception("Proveedor no encontrado o no tiene artículos asociados");
+        }
+
+        List<ProveedorxArticuloDTO> proveedorxArticuloDTOs = new ArrayList<>();
+
+        for (ProveedorArticulo pa : proveedorArticulos) {
+            ProveedorxArticuloDTO proveedorxArticuloDTO = new ProveedorxArticuloDTO();
+            Articulo articulo = pa.getArticulo();
+            proveedorxArticuloDTO.setCostoAlmacenamiento(articulo.getCostoAlmacenamiento());
+            proveedorxArticuloDTO.setNombre(articulo.getNombre());
+            proveedorxArticuloDTO.setStockActual(articulo.getStockActual());
+            proveedorxArticuloDTO.setEstadoArticulo(articulo.getEstadoArticulo());
+            proveedorxArticuloDTO.setModeloInventario(articulo.getModeloInventario());
+            proveedorxArticuloDTO.setCGI(pa.getCGI());
+            proveedorxArticuloDTO.setDemora(pa.getDemoraPromedio());
+            proveedorxArticuloDTO.setCostoPedido(pa.getCostoPedido());
+            proveedorxArticuloDTO.setEsPredeterminado(pa.isEsPredeterminado());
+            proveedorxArticuloDTO.setIdArticulo(pa.getArticulo().getId());
+            proveedorxArticuloDTO.setIdProveedor(pa.getProveedor().getId());
+            proveedorxArticuloDTO.setIdProveedorArticulo(pa.getId());
+            proveedorxArticuloDTOs.add(proveedorxArticuloDTO);
+        }
+
+        return proveedorxArticuloDTOs;
     }
 }

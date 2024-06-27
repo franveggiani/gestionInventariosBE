@@ -12,8 +12,8 @@ import java.util.List;
 @Repository
 public interface VentaRepository extends BaseRepository<Venta, Long> {
 
-    @Query(value = "SELECT v FROM Venta v WHERE v.fechaHoraAlta <= :fechaHasta AND v.fechaHoraAlta >= :fechaDesde AND articulo = :articulo")
-    List<Venta> listaPorPeriodo(@Param("fechaDesde") LocalDate fechaDesde, @Param("fechaHasta") LocalDate fechaHasta, @Param("articulo") Articulo articulo);
+    @Query(value = "SELECT v FROM Venta v WHERE v.fechaHoraAlta >= :fechaDesde AND v.fechaHoraAlta <= :fechaHasta AND articulo = :articulo")
+    List<Venta> findByPeriodoAndArticulo(@Param("fechaDesde") LocalDate fechaDesde, @Param("fechaHasta") LocalDate fechaHasta, @Param("articulo") Articulo articulo);
 
     @Query(value = "SELECT v FROM Venta v WHERE v.fechaHoraAlta = :fechaParametro")
     List<Venta> findByFecha(@Param("fechaParametro") LocalDate fechaParametro);
@@ -26,5 +26,8 @@ public interface VentaRepository extends BaseRepository<Venta, Long> {
 
     @Query(value = "SELECT v FROM Venta v WHERE YEAR(v.fechaHoraAlta) = :year AND articulo = :articulo")
     List<Venta> findByYearAndArticulo(@Param("year") int year, @Param("articulo") Articulo articulo);
+
+    @Query(value = "SELECT v FROM Venta v WHERE articulo = :articulo")
+    List<Venta> findByArticulo(@Param("articulo") Articulo articulo);
 
 }

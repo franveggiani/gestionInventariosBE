@@ -115,12 +115,12 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
             System.out.println(datosInventario.getT());
 
             if (articuloOptional.isPresent()) {
-                ModeloInventario modeloInventario = datosInventario.getModeloInventario();
+                Articulo articulo = articuloOptional.get();
+                ModeloInventario modeloInventario = articulo.getModeloInventario();
 
                 CalculosInventario calculosInventario = calculosInventarioFactory.getCalculosInventario(modeloInventario);
                 DTODatosInventarioOutput dtoDatosInventarioOutput = calculosInventario.getDatosInventario(datosInventario);
 
-                Articulo articulo = articuloOptional.get();
                 articulo.setPuntoPedido(dtoDatosInventarioOutput.getROP());
                 articulo.setStockSeguridad((int) dtoDatosInventarioOutput.getStockSeguridad());
                 articulo.setModeloInventario(modeloInventario);
@@ -142,6 +142,8 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
                 proveedorArticulo.setCostoPedido(datosInventario.getCostoPedido());
                 proveedorArticulo.setEOQ(dtoDatosInventarioOutput.getQ());
                 proveedorArticulo.setCGI(dtoDatosInventarioOutput.getCGI());
+                proveedorArticulo.setPrecioPorUnidad(datosInventario.getPrecioUnidad());
+                proveedorArticulo.setNivelDeServicio(datosInventario.getZ());
 
                 //proveedorArticulo.setEstadoActual(datosInventario.getEstadoProveedorArticulo());
 
@@ -162,6 +164,60 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
             throw new Exception(e.getMessage());
         }
     }
+
+    @Override
+    public ProveedorArticulo setPAPredeterminado(Long idProveedorArticulo) throws Exception{
+        try{
+            Optional<ProveedorArticulo> proveedorArticuloOptional = proveedorArticuloRepository.findById(idProveedorArticulo);
+            ProveedorArticulo proveedorArticulo;
+            if (proveedorArticuloOptional.isPresent()) {
+
+                proveedorArticulo = proveedorArticuloOptional.get();
+                Articulo articulo = proveedorArticulo.getArticulo();
+
+                ModeloInventario modeloInventario = articulo.getModeloInventario();
+
+                CalculosInventario calculosInventario = calculosInventarioFactory.getCalculosInventario(modeloInventario);
+
+                List<ProveedorArticulo> proveedorArticuloList = proveedorArticuloRepository.findByPredeterminado(true, articulo);
+
+                //Buscamos si hay alguno predeterminado y lo seteamos como no false
+                for (ProveedorArticulo pa : proveedorArticuloList){
+                    pa.setEsPredeterminado(false);
+                    proveedorArticuloRepository.save(pa);
+                }
+
+                proveedorArticulo.setEsPredeterminado(true);
+
+                DTODatosInventario datosInventario = new DTODatosInventario();
+                datosInventario.setIdArticulo(articulo.getId());
+                datosInventario.setIdProveedor(proveedorArticulo.getProveedor().getId());
+                datosInventario.setL(proveedorArticulo.getDemoraPromedio());
+                datosInventario.setCostoPedido(proveedorArticulo.getCostoPedido());
+                datosInventario.setYear(proveedorArticulo.getYear());
+                datosInventario.setT(proveedorArticulo.getPeriodoRevision());
+                datosInventario.setZ(proveedorArticulo.getNivelDeServicio());
+
+                DTODatosInventarioOutput dtoDatosInventarioOutput = calculosInventario.getDatosInventario(datosInventario);
+
+                articulo.setStockSeguridad((int) dtoDatosInventarioOutput.getStockSeguridad());
+                articulo.setPuntoPedido(dtoDatosInventarioOutput.getROP());
+
+                articuloRepository.save(articulo);
+                proveedorArticuloRepository.save(proveedorArticulo);
+
+                return proveedorArticulo;
+
+            } else {
+                throw new NoSuchElementException("El articulo no existe o el proveedor no existe");
+            }
+
+        } catch (Exception e){
+            throw new Exception(e.getMessage());
+        }
+    }
+
+
 
 }
 
