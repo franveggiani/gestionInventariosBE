@@ -9,6 +9,7 @@ import com.yarmovezzoli.gestioninv.Entities.Articulo;
 import com.yarmovezzoli.gestioninv.Entities.DemandaHistorica;
 import com.yarmovezzoli.gestioninv.Entities.PrediccionDemanda;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
+import com.yarmovezzoli.gestioninv.Enums.EstadoArticulo;
 import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
 import com.yarmovezzoli.gestioninv.Enums.TipoPrediccion;
 import com.yarmovezzoli.gestioninv.Factory.PrediccionDemandaFactory;
@@ -47,24 +48,40 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     @Override
     public Venta createVenta(VentaRequestDTO ventaRequest) throws Exception {
         try {
-            Venta nuevaVenta = new Venta();
-
-            nuevaVenta.setCantidad(ventaRequest.getCantidad());
-
-            if (ventaRequest.getFechaHoraAlta() == null){
-                nuevaVenta.setFechaHoraAlta(LocalDate.now());
-            } else {
-                nuevaVenta.setFechaHoraAlta(ventaRequest.getFechaHoraAlta());
-            }
-
             Optional<Articulo> articuloOptional = articuloRepository.findById(ventaRequest.getArticuloId());
 
-            if (articuloOptional.isPresent()){
-
+            if (articuloOptional.isPresent()) {
                 Articulo articulo = articuloOptional.get();
 
+                Venta nuevaVenta = new Venta();
+                nuevaVenta.setCantidad(ventaRequest.getCantidad());
                 nuevaVenta.setArticulo(articulo);
-                articulo.descontarStock(ventaRequest.getCantidad());
+
+                int stockActual = articulo.getStockActual();
+                int puntoPedido = articulo.getPuntoPedido();
+                int cantidadVenta = ventaRequest.getCantidad();
+
+                if (stockActual < cantidadVenta) {
+                    throw new Exception("No hay suficiente stock para la venta");
+                } else {
+                    articulo.setStockActual(articulo.getStockActual() - ventaRequest.getCantidad());
+
+                    stockActual = articulo.getStockActual();
+
+                    if (stockActual <= puntoPedido){
+                        articulo.setEstadoArticulo(EstadoArticulo.A_REPONER);
+                        if (stockActual == 0){
+                            articulo.setEstadoArticulo(EstadoArticulo.NO_DISPONIBLE);
+                        }
+                    }
+
+                }
+
+                if (ventaRequest.getFechaHoraAlta() == null) {
+                    nuevaVenta.setFechaHoraAlta(LocalDate.now());
+                } else {
+                    nuevaVenta.setFechaHoraAlta(ventaRequest.getFechaHoraAlta());
+                }
 
                 articuloRepository.save(articulo);
                 ventaRepository.save(nuevaVenta);
@@ -172,20 +189,100 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
     @Override
     public List<ErrorDTO> getErrorPrediccion(Long idArticulo) throws Exception {
         try {
-
+            LocalDate fechaActual = LocalDate.now();
             Optional<Articulo> articuloOptional = articuloRepository.findById(idArticulo);
 
             if (articuloOptional.isPresent()) {
                 Articulo articulo = articuloOptional.get();
 
+                List<Integer> ventasPorPeriodo = new ArrayList<>();
+                LocalDate fechaInicioPeriodo = fechaActual.minusMonths(6);
+                LocalDate fechaFinPeriodo = fechaInicioPeriodo.plusMonths(1);
+                for (int i = 0; i < 6; i++) {
+                    List<Venta> ventasPeriodo = ventaRepository.findByPeriodoAndArticulo(fechaInicioPeriodo, fechaFinPeriodo, articulo);
+
+                    int ventas = 0;
+                    for (Venta venta : ventasPeriodo){
+                        ventas += venta.getCantidad();
+                    }
+                    ventasPorPeriodo.add(ventas);
+
+                    fechaInicioPeriodo = fechaInicioPeriodo.plusMonths(1);
+                    fechaFinPeriodo = fechaInicioPeriodo.plusMonths(1);
+
+                }
+
+                PrediccionDemandaStrategy prediccionDemandaStrategyPM = prediccionDemandaFactory.getPrediccionDemandaStrategy(TipoPrediccion.PROM_MOVIL);
+                PrediccionDemandaStrategy prediccionDemandaStrategyPMP = prediccionDemandaFactory.getPrediccionDemandaStrategy(TipoPrediccion.PROM_MOVIL_PONDERADO);
+
+                List<PrediccionDemanda> prediccionDemandaPM = new ArrayList<>();
+                List<PrediccionDemanda> prediccionDemandaPMP = new ArrayList<>();
+
+                fechaInicioPeriodo = fechaActual.minusMonths(6);
+
+                for (int i = 0; i < ventasPorPeriodo.size(); i++) {
+                    PrediccionDemandaRequest prediccionDemandaRequestPM = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.PROM_MOVIL, null, 0.0f);
+                    PrediccionDemandaRequest prediccionDemandaRequestPMP = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.PROM_MOVIL_PONDERADO, new Double[]{0.3, 0.2, 0.2, 0.1, 0.1, 0.1}, 0.0f);
+
+                    List<PrediccionDemanda> prediccionDemandaTempPM = prediccionDemandaStrategyPM.predecirDemanda(prediccionDemandaRequestPM);
+                    List<PrediccionDemanda> prediccionDemandaTempPMP = prediccionDemandaStrategyPMP.predecirDemanda(prediccionDemandaRequestPMP);
+
+                    prediccionDemandaPM.add(prediccionDemandaTempPM.get(0));
+                    prediccionDemandaPMP.add(prediccionDemandaTempPMP.get(0));
+
+                    fechaInicioPeriodo = fechaInicioPeriodo.plusMonths(1);
+                }
+
+                int sumatoriaPM = 0;
+                int sumatoriaPMP = 0;
+                for (int i = 0; i < ventasPorPeriodo.size(); i++) {
+                    sumatoriaPM += Math.abs(ventasPorPeriodo.get(i) - prediccionDemandaPM.get(i).getPrediccion());
+                    sumatoriaPMP += Math.abs(ventasPorPeriodo.get(i) - prediccionDemandaPMP.get(i).getPrediccion());
+                }
+
+                float errorPM = sumatoriaPM / 6;
+                float errorPMP = sumatoriaPMP / 6;
+
+                List<ErrorDTO> errorDTOList = new ArrayList<>();
+
+                ErrorDTO errorDTOPM = new ErrorDTO();
+                errorDTOPM.setError(errorPM);
+                errorDTOPM.setFechaCalculoError(fechaActual);
+                errorDTOPM.setTipoPrediccion(TipoPrediccion.PROM_MOVIL);
+                errorDTOPM.setNombreArticulo(articulo.getNombre());
+
+                ErrorDTO errorDTOPMP = new ErrorDTO();
+                errorDTOPMP.setError(errorPMP);
+                errorDTOPMP.setFechaCalculoError(fechaActual);
+                errorDTOPMP.setTipoPrediccion(TipoPrediccion.PROM_MOVIL_PONDERADO);
+                errorDTOPMP.setNombreArticulo(articulo.getNombre());
+
+                errorDTOList.add(errorDTOPM);
+                errorDTOList.add(errorDTOPMP);
+
+                return errorDTOList;
+
+            } else {
+                throw new Exception("No se encontró el artículo: " + idArticulo);
             }
-
-
-
-            return null;
         } catch (Exception e) {
             throw new Exception("Error al obtener las predicciones: " + e.getMessage());
         }
+    }
+
+    public PrediccionDemandaRequest crearPrediccionDemandaRequest(int cantPred, int numPeriodos, TipoPeriodo tipoPeriodo, Long articuloId, LocalDate fechaDesdePrediccion, TipoPrediccion tipoPrediccion, Double[] ponderaciones, float alpha) {
+        PrediccionDemandaRequest prediccionDemandaRequest = new PrediccionDemandaRequest();
+
+        prediccionDemandaRequest.setCantidadPredicciones(cantPred);
+        prediccionDemandaRequest.setNumeroPeriodos(numPeriodos);
+        prediccionDemandaRequest.setTipoPeriodo(tipoPeriodo);
+        prediccionDemandaRequest.setArticuloId(articuloId);
+        prediccionDemandaRequest.setFechaDesdePrediccion(fechaDesdePrediccion);
+        prediccionDemandaRequest.setTipoPrediccion(tipoPrediccion);
+        prediccionDemandaRequest.setPonderaciones(ponderaciones);
+        prediccionDemandaRequest.setAlpha(alpha);
+
+        return prediccionDemandaRequest;
     }
 
 }

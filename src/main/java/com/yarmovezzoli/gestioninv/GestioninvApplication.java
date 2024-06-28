@@ -52,7 +52,7 @@ public class GestioninvApplication {
 			Articulo articulo1 = new Articulo();
 			articulo1.setId(Long.valueOf(1L));
 			articulo1.setNombre("Palo de escoba");
-			articulo1.setStockActual(34);
+			articulo1.setStockActual(5000);
 			articulo1.setCostoAlmacenamiento(Double.valueOf(50));
 			articulo1.setModeloInventario(ModeloInventario.INTERVALO_FIJO);
 			articuloList.add(articulo1);
@@ -60,7 +60,7 @@ public class GestioninvApplication {
 			Articulo articulo2 = new Articulo();
 			articulo2.setId(Long.valueOf(2L));
 			articulo2.setNombre("Tractor Challenger MT875E");
-			articulo2.setStockActual(100);
+			articulo2.setStockActual(5000);
 			articulo2.setCostoAlmacenamiento(Double.valueOf(1000));
 			articulo2.setModeloInventario(ModeloInventario.INTERVALO_FIJO);
 			articuloList.add(articulo2);
@@ -68,7 +68,7 @@ public class GestioninvApplication {
 			Articulo articulo3 = new Articulo();
 			articulo3.setId(Long.valueOf(3L));
 			articulo3.setNombre("Coche Alfa Romeo 148 2012");
-			articulo3.setStockActual(10);
+			articulo3.setStockActual(5000);
 			articulo3.setCostoAlmacenamiento(Double.valueOf(1500));
 			articulo3.setModeloInventario(ModeloInventario.INTERVALO_FIJO);
 			articuloList.add(articulo3);
@@ -110,7 +110,6 @@ public class GestioninvApplication {
 				fechaActual = fechaActual.plusMonths(1);
 
 			}
-			//Para probar la demanda histórica
 
 		};
 	}

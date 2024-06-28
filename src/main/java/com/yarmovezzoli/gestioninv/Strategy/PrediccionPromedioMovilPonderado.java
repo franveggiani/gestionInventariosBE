@@ -59,11 +59,14 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
         float numerador = 0;
         int promedioPonderado;
         for (int i = 0; i < ponderaciones.length; i++) {
-            numerador += (float) ventasPorPeriodo.get(i);
+            numerador += (float) ventasPorPeriodo.get(i) * ponderaciones[i];
             denominador += ponderaciones[i];
+
+            System.out.println("periodo: " + i + " ponderacion: " + ponderaciones[i] + " sumatoria: " + ventasPorPeriodo.get(i));
         }
 
         promedioPonderado = Math.round(numerador / denominador);
+        System.out.println("promedioPonderado: " + promedioPonderado);
 
         List<PrediccionDemanda> prediccionDemandaList = new ArrayList<>();
 
