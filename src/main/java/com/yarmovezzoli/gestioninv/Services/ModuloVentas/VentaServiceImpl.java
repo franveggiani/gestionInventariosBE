@@ -213,7 +213,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 for (int i = 0; i < ventasPorPeriodo.size(); i++) {
                     PrediccionDemandaRequest prediccionDemandaRequestPM = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.PROM_MOVIL, null, 0.0f);
                     PrediccionDemandaRequest prediccionDemandaRequestPMP = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.PROM_MOVIL_PONDERADO, new Double[]{0.1, 0.1, 0.1, 0.2, 0.2, 0.3}, 0.0f);
-                    PrediccionDemandaRequest prediccionDemandaRequestSE = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.EXPONENCIAL, null, 0.01f);
+                    PrediccionDemandaRequest prediccionDemandaRequestSE = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.EXPONENCIAL, null, 0.5f);
 
                     List<PrediccionDemanda> prediccionDemandaTempPM = prediccionDemandaStrategyPM.predecirDemanda(prediccionDemandaRequestPM);
                     List<PrediccionDemanda> prediccionDemandaTempPMP = prediccionDemandaStrategyPMP.predecirDemanda(prediccionDemandaRequestPMP);
@@ -253,11 +253,13 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 errorDTOPMP.setTipoPrediccion(TipoPrediccion.PROM_MOVIL_PONDERADO);
                 errorDTOPMP.setNombreArticulo(articulo.getNombre());
 
+                System.out.println(errorSE + " "+ fechaActual + " " + articulo.getNombre());
+
                 ErrorDTO errorDTOSE = new ErrorDTO();
-                errorDTOPMP.setError(errorSE);
-                errorDTOPMP.setFechaCalculoError(fechaActual);
-                errorDTOPMP.setTipoPrediccion(TipoPrediccion.EXPONENCIAL);
-                errorDTOPMP.setNombreArticulo(articulo.getNombre());
+                errorDTOSE.setError(errorSE);
+                errorDTOSE.setFechaCalculoError(fechaActual);
+                errorDTOSE.setTipoPrediccion(TipoPrediccion.EXPONENCIAL);
+                errorDTOSE.setNombreArticulo(articulo.getNombre());
 
                 errorDTOList.add(errorDTOPM);
                 errorDTOList.add(errorDTOPMP);
