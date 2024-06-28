@@ -27,13 +27,17 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
     @Override
     public List<PrediccionDemanda> predecirDemanda(PrediccionDemandaRequest prediccionDemandaRequest) {
 
-        LocalDate fechaInicioPrediccion = prediccionDemandaRequest.getFechaDesdePrediccion();
+        LocalDate fechaInicioPrediccion = prediccionDemandaRequest.getFechaDesdePrediccion() != null ? prediccionDemandaRequest.getFechaDesdePrediccion() : LocalDate.now();
         TipoPeriodo tipoPeriodo = prediccionDemandaRequest.getTipoPeriodo();
         Long idArticulo = prediccionDemandaRequest.getArticuloId();
         Long cantDiasPeriodo = tipoPeriodo.getDias();
         Articulo articulo = articuloRepository.findById(idArticulo).orElse(null);
         int numeroPeriodos = prediccionDemandaRequest.getNumeroPeriodos();
         Double[] ponderaciones = prediccionDemandaRequest.getPonderaciones();
+
+        if (ponderaciones.length!= numeroPeriodos) {
+            throw new IllegalArgumentException("La cantidad de ponderaciones debe ser igual a la cantidad de periodos");
+        }
 
         LocalDate fechaInicioPeriodo = fechaInicioPrediccion.minusDays(cantDiasPeriodo*numeroPeriodos);
         LocalDate fechaFinPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
@@ -48,7 +52,7 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
             for (Venta venta : ventaList) {
                 sumatoria += venta.getCantidad();
             }
-
+            System.out.println("periodo: " + (i + 1) + "; ventas obtenidas del periodo: " + sumatoria + "; desde: " + fechaInicioPeriodo + "; hasta: " + fechaFinPeriodo);
             ventasPorPeriodo.add(sumatoria);
 
             fechaInicioPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
@@ -59,11 +63,14 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
         float numerador = 0;
         int promedioPonderado;
         for (int i = 0; i < ponderaciones.length; i++) {
-            numerador += (float) ventasPorPeriodo.get(i);
+            numerador += (float) ventasPorPeriodo.get(i) * ponderaciones[i];
             denominador += ponderaciones[i];
+
+            System.out.println("Periodo: " + i + "; Ponderacion: " + ponderaciones[i] + "; Ventas del periodo: " + ventasPorPeriodo.get(i));
         }
 
         promedioPonderado = Math.round(numerador / denominador);
+        System.out.println("promedioPonderado: " + promedioPonderado);
 
         List<PrediccionDemanda> prediccionDemandaList = new ArrayList<>();
 
