@@ -75,7 +75,6 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                             articulo.setEstadoArticulo(EstadoArticulo.NO_DISPONIBLE);
                         }
                     }
-
                 }
 
                 if (ventaRequest.getFechaHoraAlta() == null) {
