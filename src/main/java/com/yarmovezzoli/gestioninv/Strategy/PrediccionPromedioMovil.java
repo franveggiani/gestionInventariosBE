@@ -52,7 +52,7 @@ public class PrediccionPromedioMovil implements PrediccionDemandaStrategy {
             }
             ventasPorPeriodo.add(ventasDelPeriodo);
 
-            System.out.println("periodo: " + i + "; ventas obtenidas del periodo: " + ventasDelPeriodo + "; desde: " + fechaInicioPeriodo + "; hasta: " + fechaFinPeriodo);
+            System.out.println("periodo: " + (i + 1) + "; ventas obtenidas del periodo: " + ventasDelPeriodo + "; desde: " + fechaInicioPeriodo + "; hasta: " + fechaFinPeriodo);
 
             fechaInicioPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
             fechaFinPeriodo = fechaFinPeriodo.plusDays(cantDiasPeriodo);

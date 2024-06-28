@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements VentaService{
@@ -159,20 +160,7 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
             }
 
             //Creo lista de DTO's
-            List<PrediccionDTO> prediccionDTOList = new ArrayList<>();
-            for (int i = 0; i < prediccionDemandaList.size(); i++) {
-                PrediccionDemanda prediccion = prediccionDemandaList.get(i);
-
-                PrediccionDTO prediccionDTO = new PrediccionDTO();
-                prediccionDTO.setFechaDesdePrediccion(prediccion.getFechaDesde());
-                prediccionDTO.setFechaHastaPrediccion(prediccion.getFechaHasta());
-                prediccionDTO.setCantidadPredecida(prediccion.getPrediccion());
-                prediccionDTO.setNombreArticulo(prediccion.getArticulo().getNombre());
-                prediccionDTO.setIdArticulo(prediccion.getArticulo().getId());
-                prediccionDTO.setFechaPrediccionRealizada(prediccion.getFechaPrediccion());
-
-                prediccionDTOList.add(prediccionDTO);
-            }
+            List<PrediccionDTO> prediccionDTOList = prediccionDemandaList.stream().map(prediccion -> getPrediccionDTO(prediccion)).collect(Collectors.toList());
             
             return prediccionDTOList;
 
@@ -214,34 +202,42 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
                 PrediccionDemandaStrategy prediccionDemandaStrategyPM = prediccionDemandaFactory.getPrediccionDemandaStrategy(TipoPrediccion.PROM_MOVIL);
                 PrediccionDemandaStrategy prediccionDemandaStrategyPMP = prediccionDemandaFactory.getPrediccionDemandaStrategy(TipoPrediccion.PROM_MOVIL_PONDERADO);
+                PrediccionDemandaStrategy prediccionDemandaStrategySE = prediccionDemandaFactory.getPrediccionDemandaStrategy(TipoPrediccion.EXPONENCIAL);
 
                 List<PrediccionDemanda> prediccionDemandaPM = new ArrayList<>();
                 List<PrediccionDemanda> prediccionDemandaPMP = new ArrayList<>();
+                List<PrediccionDemanda> prediccionDemandaSE = new ArrayList<>();
 
                 fechaInicioPeriodo = fechaActual.minusMonths(6);
 
                 for (int i = 0; i < ventasPorPeriodo.size(); i++) {
                     PrediccionDemandaRequest prediccionDemandaRequestPM = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.PROM_MOVIL, null, 0.0f);
-                    PrediccionDemandaRequest prediccionDemandaRequestPMP = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.PROM_MOVIL_PONDERADO, new Double[]{0.3, 0.2, 0.2, 0.1, 0.1, 0.1}, 0.0f);
+                    PrediccionDemandaRequest prediccionDemandaRequestPMP = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.PROM_MOVIL_PONDERADO, new Double[]{0.1, 0.1, 0.1, 0.2, 0.2, 0.3}, 0.0f);
+                    PrediccionDemandaRequest prediccionDemandaRequestSE = crearPrediccionDemandaRequest(1, 6, TipoPeriodo.MENSUAL, articulo.getId(), fechaInicioPeriodo, TipoPrediccion.EXPONENCIAL, null, 0.01f);
 
                     List<PrediccionDemanda> prediccionDemandaTempPM = prediccionDemandaStrategyPM.predecirDemanda(prediccionDemandaRequestPM);
                     List<PrediccionDemanda> prediccionDemandaTempPMP = prediccionDemandaStrategyPMP.predecirDemanda(prediccionDemandaRequestPMP);
+                    List<PrediccionDemanda> prediccionDemandaTempSE = prediccionDemandaStrategySE.predecirDemanda(prediccionDemandaRequestSE);
 
                     prediccionDemandaPM.add(prediccionDemandaTempPM.get(0));
                     prediccionDemandaPMP.add(prediccionDemandaTempPMP.get(0));
+                    prediccionDemandaSE.add(prediccionDemandaTempSE.get(0));
 
                     fechaInicioPeriodo = fechaInicioPeriodo.plusMonths(1);
                 }
 
                 int sumatoriaPM = 0;
                 int sumatoriaPMP = 0;
+                int sumatoriaSE = 0;
                 for (int i = 0; i < ventasPorPeriodo.size(); i++) {
                     sumatoriaPM += Math.abs(ventasPorPeriodo.get(i) - prediccionDemandaPM.get(i).getPrediccion());
                     sumatoriaPMP += Math.abs(ventasPorPeriodo.get(i) - prediccionDemandaPMP.get(i).getPrediccion());
+                    sumatoriaSE += Math.abs(ventasPorPeriodo.get(i) - prediccionDemandaSE.get(i).getPrediccion());
                 }
 
                 float errorPM = sumatoriaPM / 6;
                 float errorPMP = sumatoriaPMP / 6;
+                float errorSE = sumatoriaSE / 6;
 
                 List<ErrorDTO> errorDTOList = new ArrayList<>();
 
@@ -257,8 +253,15 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 errorDTOPMP.setTipoPrediccion(TipoPrediccion.PROM_MOVIL_PONDERADO);
                 errorDTOPMP.setNombreArticulo(articulo.getNombre());
 
+                ErrorDTO errorDTOSE = new ErrorDTO();
+                errorDTOPMP.setError(errorSE);
+                errorDTOPMP.setFechaCalculoError(fechaActual);
+                errorDTOPMP.setTipoPrediccion(TipoPrediccion.EXPONENCIAL);
+                errorDTOPMP.setNombreArticulo(articulo.getNombre());
+
                 errorDTOList.add(errorDTOPM);
                 errorDTOList.add(errorDTOPMP);
+                errorDTOList.add(errorDTOSE);
 
                 return errorDTOList;
 
@@ -283,6 +286,19 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
         prediccionDemandaRequest.setAlpha(alpha);
 
         return prediccionDemandaRequest;
+    }
+
+    //Crear DTO de predicciones
+    private static PrediccionDTO getPrediccionDTO(PrediccionDemanda prediccion) {
+        PrediccionDTO prediccionDTO = new PrediccionDTO();
+        prediccionDTO.setFechaDesdePrediccion(prediccion.getFechaDesde());
+        prediccionDTO.setFechaHastaPrediccion(prediccion.getFechaHasta());
+        prediccionDTO.setCantidadPredecida(prediccion.getPrediccion());
+        prediccionDTO.setNombreArticulo(prediccion.getArticulo().getNombre());
+        prediccionDTO.setIdArticulo(prediccion.getArticulo().getId());
+        prediccionDTO.setFechaPrediccionRealizada(prediccion.getFechaPrediccion());
+
+        return prediccionDTO;
     }
 
 }

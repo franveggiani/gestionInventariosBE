@@ -52,7 +52,7 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
             for (Venta venta : ventaList) {
                 sumatoria += venta.getCantidad();
             }
-            System.out.println("periodo: " + i + "; ventas obtenidas del periodo: " + sumatoria + "; desde: " + fechaInicioPeriodo + "; hasta: " + fechaFinPeriodo);
+            System.out.println("periodo: " + (i + 1) + "; ventas obtenidas del periodo: " + sumatoria + "; desde: " + fechaInicioPeriodo + "; hasta: " + fechaFinPeriodo);
             ventasPorPeriodo.add(sumatoria);
 
             fechaInicioPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
