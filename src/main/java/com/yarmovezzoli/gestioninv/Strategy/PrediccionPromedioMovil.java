@@ -29,7 +29,7 @@ public class PrediccionPromedioMovil implements PrediccionDemandaStrategy {
     public List<PrediccionDemanda> predecirDemanda(PrediccionDemandaRequest prediccionDemandaRequest) {
 
         int cantidadPredicciones = prediccionDemandaRequest.getCantidadPredicciones();
-        LocalDate fechaInicioPrediccion = prediccionDemandaRequest.getFechaDesdePrediccion();
+        LocalDate fechaInicioPrediccion = prediccionDemandaRequest.getFechaDesdePrediccion() != null ? prediccionDemandaRequest.getFechaDesdePrediccion() : LocalDate.now();
         TipoPeriodo tipoPeriodo = prediccionDemandaRequest.getTipoPeriodo();
         Long idArticulo = prediccionDemandaRequest.getArticuloId();
         Long cantDiasPeriodo = tipoPeriodo.getDias();
@@ -52,8 +52,11 @@ public class PrediccionPromedioMovil implements PrediccionDemandaStrategy {
             }
             ventasPorPeriodo.add(ventasDelPeriodo);
 
+            System.out.println("periodo: " + i + "; ventas obtenidas del periodo: " + ventasDelPeriodo + "; desde: " + fechaInicioPeriodo + "; hasta: " + fechaFinPeriodo);
+
             fechaInicioPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
             fechaFinPeriodo = fechaFinPeriodo.plusDays(cantDiasPeriodo);
+
         }
 
         int sumatoria = 0;
@@ -63,6 +66,9 @@ public class PrediccionPromedioMovil implements PrediccionDemandaStrategy {
         }
 
         int prediccion = sumatoria / numeroPeriodos;
+
+        System.out.println("Prediccion: " + prediccion + "; sumatoria: " + sumatoria + "; numeroPeriodos: " + numeroPeriodos);
+
         predicciones.add(prediccion);
 
         PrediccionDemanda prediccionDemanda = crearPrediccionDemanda(prediccion, fechaInicioPrediccion, articulo, cantDiasPeriodo);
