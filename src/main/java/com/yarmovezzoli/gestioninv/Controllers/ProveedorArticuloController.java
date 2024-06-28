@@ -48,4 +48,13 @@ import java.util.List;
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
+    @GetMapping("/getproveedorPredeterminado/{idArticulo}")
+    public ResponseEntity<?> getproveedorPredeterminado(@PathVariable Long idArticulo) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(service.getPAPredeterminado(idArticulo));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
 }

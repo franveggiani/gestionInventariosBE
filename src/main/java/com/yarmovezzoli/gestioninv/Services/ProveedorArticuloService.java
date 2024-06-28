@@ -13,4 +13,5 @@ public interface ProveedorArticuloService extends BaseService<ProveedorArticulo,
     public ProveedorArticulo nuevoProveedorArticulo(CrearProveedorArticuloRequest crearProveedorArticuloRequest) throws Exception;
     public Optional<ProveedorArticulo> modificarDatosProveedorArticulo(Long id, EditarProveedorArticuloDTO editarProveedorArticuloDTO) throws Exception;
     public List<ProveedorxArticuloDTO> obtenerArticulosPorProveedor(Long proveedorId) throws Exception;
+    public ProveedorArticulo getPAPredeterminado(Long articuloId) throws Exception;
 }
