@@ -4,20 +4,26 @@ import com.yarmovezzoli.gestioninv.DTOs.CrearProveedorRequest;
 import com.yarmovezzoli.gestioninv.DTOs.EditarProveedorDTO;
 import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
 import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventarioOutput;
+import com.yarmovezzoli.gestioninv.DTOs.PrediccionDemandaRequest;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
+import com.yarmovezzoli.gestioninv.Entities.PrediccionDemanda;
 import com.yarmovezzoli.gestioninv.Entities.Proveedor;
 import com.yarmovezzoli.gestioninv.Entities.ProveedorArticulo;
 import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
+import com.yarmovezzoli.gestioninv.Enums.TipoPrediccion;
 import com.yarmovezzoli.gestioninv.Factory.CalculosInventarioFactory;
+import com.yarmovezzoli.gestioninv.Factory.PrediccionDemandaFactory;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.BaseRepository;
 import com.yarmovezzoli.gestioninv.Repositories.ProveedorArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.ProveedorRepository;
 import com.yarmovezzoli.gestioninv.Services.BaseServiceImpl;
 import com.yarmovezzoli.gestioninv.Strategy.CalculosInventario;
+import com.yarmovezzoli.gestioninv.Strategy.PrediccionDemandaStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -144,6 +150,7 @@ public class ProveedorServiceImpl extends BaseServiceImpl<Proveedor,Long> implem
                 proveedorArticulo.setCGI(dtoDatosInventarioOutput.getCGI());
                 proveedorArticulo.setPrecioPorUnidad(datosInventario.getPrecioUnidad());
                 proveedorArticulo.setNivelDeServicio(datosInventario.getZ());
+                proveedorArticulo.setPrecioPorUnidad(datosInventario.getPrecioUnidad());
 
                 //proveedorArticulo.setEstadoActual(datosInventario.getEstadoProveedorArticulo());
 

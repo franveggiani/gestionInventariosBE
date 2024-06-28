@@ -2,9 +2,14 @@ package com.yarmovezzoli.gestioninv.Strategy;
 
 import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventario;
 import com.yarmovezzoli.gestioninv.DTOs.ModuloInventarios.DTODatosInventarioOutput;
+import com.yarmovezzoli.gestioninv.DTOs.PrediccionDemandaRequest;
 import com.yarmovezzoli.gestioninv.Entities.Articulo;
+import com.yarmovezzoli.gestioninv.Entities.PrediccionDemanda;
 import com.yarmovezzoli.gestioninv.Entities.ProveedorArticulo;
 import com.yarmovezzoli.gestioninv.Entities.Venta;
+import com.yarmovezzoli.gestioninv.Enums.TipoPeriodo;
+import com.yarmovezzoli.gestioninv.Enums.TipoPrediccion;
+import com.yarmovezzoli.gestioninv.Factory.PrediccionDemandaFactory;
 import com.yarmovezzoli.gestioninv.Repositories.ArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.ProveedorArticuloRepository;
 import com.yarmovezzoli.gestioninv.Repositories.VentaRepository;
@@ -26,6 +31,8 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
     ArticuloRepository articuloRepository;
     @Autowired
     private ProveedorArticuloRepository proveedorArticuloRepository;
+    @Autowired
+    private PrediccionDemandaFactory prediccionDemandaFactory;
 
     public DTODatosInventarioOutput getDatosInventario(DTODatosInventario dtoDatosInventario) { //Cambiar el void después
 
@@ -54,6 +61,20 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
             inventarioActual = articulo.getStockActual();
             costoAlmacenamiento = articulo.getCostoAlmacenamiento();
         }
+
+        //Hago una prediccion del mes que viene
+        PrediccionDemandaRequest prediccionDemandaRequest = new PrediccionDemandaRequest();
+        prediccionDemandaRequest.setCantidadPredicciones(1);
+        prediccionDemandaRequest.setNumeroPeriodos(3);
+        prediccionDemandaRequest.setTipoPrediccion(TipoPrediccion.PROM_MOVIL);
+        prediccionDemandaRequest.setArticuloId(articulo.getId());
+        prediccionDemandaRequest.setFechaDesdePrediccion(LocalDate.now());
+        prediccionDemandaRequest.setTipoPeriodo(TipoPeriodo.MENSUAL);
+
+        PrediccionDemandaStrategy prediccionDemandaStrategy = prediccionDemandaFactory.getPrediccionDemandaStrategy(TipoPrediccion.PROM_MOVIL);
+        List<PrediccionDemanda> prediccionDemanda = prediccionDemandaStrategy.predecirDemanda(prediccionDemandaRequest);
+
+        int prediccionMesQueViene = prediccionDemanda.get(0).getPrediccion();
 
         List<Integer> ventasPorDia = new ArrayList<>();
         int ventasTotales = 0;
@@ -106,7 +127,10 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
         demandaAnual = ventasAnuales[0];
 
         //Ahora calculamos q
-        int q = Math.round(demandaPromedio*(T+L) + stockSeguridad - inventarioActual);
+        // ESTA FORMULA SE USABA ANTERIORMENTE, PERO ES ÚLTIL PARA CALCULAR A FINAL DEL PERIODO T:
+        // int q = Math.round(demandaPromedio*(T+L) + stockSeguridad - inventarioActual);
+        // AHORA SE USA ESTA, PORQUE LO QUEREMOS SABER CON ANTERIORIDAD
+        int q = Math.max(0, Math.round(prediccionMesQueViene - inventarioActual + stockSeguridad));
 
         //Calculamos CGI
         float CGI = (float) (precioUnidad * q + costoAlmacenamiento * (q/2) + costoPedido * demandaAnual/q);
@@ -115,6 +139,7 @@ public class CalculosInventarioRevisionPeriodica implements CalculosInventario{
         dtoDatosInventarioOutput.setQ(q);
         dtoDatosInventarioOutput.setROP(ROP);
         dtoDatosInventarioOutput.setStockSeguridad(stockSeguridad);
+        dtoDatosInventarioOutput.setCGI(CGI);
 
         return dtoDatosInventarioOutput;
 

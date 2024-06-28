@@ -93,23 +93,17 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         desviacionEstandar = (float) Math.sqrt(varianza);
 
         //Stock de seguridad
-        stockSeguridad = (int) Math.round(Z * desviacionEstandar * Math.sqrt(L));
+        stockSeguridad = getStockSeguridad(Z, desviacionEstandar, L);
 
         //Obteniendo demanda anual
         List<Venta> listasAnuales = ventaRepository.findByYearAndArticulo(year, articulo);
-
-        int ventasAnuales = 0;
-        for (Venta venta : listasAnuales) {
-            ventasAnuales += venta.getCantidad();
-        }
-
-        demandaAnual = ventasAnuales;
+        demandaAnual = listasAnuales.stream().mapToInt(Venta::getCantidad).sum();
 
         //Finalmente calculamos EOQ
-        EOQ = (int) Math.round(Math.sqrt((2*demandaAnual*costoPedido)/(costoAlmacenamiento)));
+        EOQ = getQ(demandaAnual, costoPedido, costoAlmacenamiento);
 
         //Calculando ROP (o PP)
-        ROP = (int) demandaPromedio * L + stockSeguridad;
+        ROP = getPP(demandaPromedio, stockSeguridad, L);
 
         //Calculamos CGI
         float CGI = (float) (precioUnidad * EOQ + costoAlmacenamiento * (EOQ/2) + costoPedido * demandaAnual/EOQ);
@@ -124,4 +118,20 @@ public class CalculosInventarioRevisionContinua implements CalculosInventario{
         return dtoDatosInventarioOutput;
 
     }
+
+    public int getStockSeguridad(float Z, float desviacionEstandar, int L){
+        int stockSeguridad = (int) Math.round(Z * desviacionEstandar * Math.sqrt(L));
+        return stockSeguridad;
+    }
+
+    public int getQ (int demandaAnual, float costoPedido, Double costoAlmacenamiento){
+        int EOQ = (int) Math.round(Math.sqrt((2*demandaAnual*costoPedido)/(costoAlmacenamiento)));
+        return EOQ;
+    }
+
+    public int getPP(double demandaPromedio, int stockSeguridad, int L){
+        int ROP = (int) demandaPromedio * L + stockSeguridad;
+        return ROP;
+    }
+
 }
