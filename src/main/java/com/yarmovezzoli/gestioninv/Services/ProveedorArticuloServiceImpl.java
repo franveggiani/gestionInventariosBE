@@ -98,11 +98,11 @@ public class ProveedorArticuloServiceImpl extends BaseServiceImpl<ProveedorArtic
         return proveedorxArticuloDTOs;
     }
 
-    public ProveedorArticulo getPAPredeterminado(Long articuloId) throws Exception {
-        Optional<ProveedorArticulo> optionalProveedorArticulo = proveedorArticuloRepository.findPredeterminadoByArticuloId(articuloId);
+    public Proveedor getPAPredeterminado(Long articuloId) throws Exception {
+        Optional<Proveedor> optionalProveedor = proveedorArticuloRepository.findPredeterminadoProveedorByArticuloId(articuloId);
 
-        if (optionalProveedorArticulo.isPresent()) {
-            return optionalProveedorArticulo.get();
+        if (optionalProveedor.isPresent()) {
+            return optionalProveedor.get();
         } else {
             throw new Exception("Proveedor predeterminado no encontrado para el artículo con ID: " + articuloId);
         }
