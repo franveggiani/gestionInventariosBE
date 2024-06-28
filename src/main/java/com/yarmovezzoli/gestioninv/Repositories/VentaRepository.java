@@ -27,4 +27,7 @@ public interface VentaRepository extends BaseRepository<Venta, Long> {
     @Query(value = "SELECT v FROM Venta v WHERE YEAR(v.fechaHoraAlta) = :year AND articulo = :articulo")
     List<Venta> findByYearAndArticulo(@Param("year") int year, @Param("articulo") Articulo articulo);
 
+    @Query(value = "SELECT v FROM Venta v WHERE articulo = :articulo")
+    List<Venta> findByArticulo(@Param("articulo") Articulo articulo);
+
 }

@@ -17,6 +17,8 @@ public interface VentaService extends BaseService<Venta, Long> {
 
     public Venta createVenta(VentaRequestDTO ventaRequestDTO) throws Exception;
 
+    public List<Venta> getVentasPorArticulo(Long articuloId) throws Exception;
+
     public DemandaHistorica createDemandaHistorica(DemandaHistoricaRequest demandaHistoricaRequest) throws Exception;
 
     List<PrediccionDTO> calcularPrediccionDemanda(PrediccionDemandaRequest prediccionDemandaRequest) throws Exception;

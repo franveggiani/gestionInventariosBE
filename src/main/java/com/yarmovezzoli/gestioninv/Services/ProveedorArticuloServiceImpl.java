@@ -86,6 +86,12 @@ public class ProveedorArticuloServiceImpl extends BaseServiceImpl<ProveedorArtic
             proveedorxArticuloDTO.setEstadoArticulo(articulo.getEstadoArticulo());
             proveedorxArticuloDTO.setModeloInventario(articulo.getModeloInventario());
             proveedorxArticuloDTO.setCGI(pa.getCGI());
+            proveedorxArticuloDTO.setDemora(pa.getDemoraPromedio());
+            proveedorxArticuloDTO.setCostoPedido(pa.getCostoPedido());
+            proveedorxArticuloDTO.setEsPredeterminado(pa.isEsPredeterminado());
+            proveedorxArticuloDTO.setIdArticulo(pa.getArticulo().getId());
+            proveedorxArticuloDTO.setIdProveedor(pa.getProveedor().getId());
+            proveedorxArticuloDTO.setIdProveedorArticulo(pa.getId());
             proveedorxArticuloDTOs.add(proveedorxArticuloDTO);
         }
 

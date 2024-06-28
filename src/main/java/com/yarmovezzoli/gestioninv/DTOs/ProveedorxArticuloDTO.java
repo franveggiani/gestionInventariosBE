@@ -16,9 +16,15 @@ import lombok.Setter;
 public class ProveedorxArticuloDTO {
 
     Double costoAlmacenamiento;
+    int demora;
+    float costoPedido;
     String nombre;
     int stockActual;
     EstadoArticulo estadoArticulo;
     ModeloInventario modeloInventario;
     float CGI;
+    Long idProveedorArticulo;
+    Long idArticulo;
+    Long idProveedor;
+    boolean esPredeterminado;
 }
