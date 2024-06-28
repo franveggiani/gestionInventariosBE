@@ -32,14 +32,15 @@ public class PrediccionPromedioMovil implements PrediccionDemandaStrategy {
         LocalDate fechaInicioPrediccion = prediccionDemandaRequest.getFechaDesdePrediccion() != null ? prediccionDemandaRequest.getFechaDesdePrediccion() : LocalDate.now();
         TipoPeriodo tipoPeriodo = prediccionDemandaRequest.getTipoPeriodo();
         Long idArticulo = prediccionDemandaRequest.getArticuloId();
-        Long cantDiasPeriodo = tipoPeriodo.getDias();
+        //Long cantDiasPeriodo = tipoPeriodo.getDias();
+        Long cantMesesPeriodo = tipoPeriodo.getCantidadMeses();
         Articulo articulo = articuloRepository.findById(idArticulo).orElse(null);
         int numeroPeriodos = prediccionDemandaRequest.getNumeroPeriodos();
         List<Integer> predicciones = new ArrayList<>();
         List<PrediccionDemanda> prediccionDemandaList = new ArrayList<>();
 
-        LocalDate fechaInicioPeriodo = fechaInicioPrediccion.minusDays(cantDiasPeriodo*numeroPeriodos);
-        LocalDate fechaFinPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
+        LocalDate fechaInicioPeriodo = fechaInicioPrediccion.minusMonths(cantMesesPeriodo*numeroPeriodos);
+        LocalDate fechaFinPeriodo = fechaInicioPeriodo.plusMonths(cantMesesPeriodo);
 
         List<Integer> ventasPorPeriodo = new ArrayList<>();
 
@@ -54,8 +55,8 @@ public class PrediccionPromedioMovil implements PrediccionDemandaStrategy {
 
             System.out.println("periodo: " + (i + 1) + "; ventas obtenidas del periodo: " + ventasDelPeriodo + "; desde: " + fechaInicioPeriodo + "; hasta: " + fechaFinPeriodo);
 
-            fechaInicioPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
-            fechaFinPeriodo = fechaFinPeriodo.plusDays(cantDiasPeriodo);
+            fechaInicioPeriodo = fechaInicioPeriodo.plusMonths(cantMesesPeriodo);
+            fechaFinPeriodo = fechaFinPeriodo.plusMonths(cantMesesPeriodo);
 
         }
 
@@ -71,7 +72,7 @@ public class PrediccionPromedioMovil implements PrediccionDemandaStrategy {
 
         predicciones.add(prediccion);
 
-        PrediccionDemanda prediccionDemanda = crearPrediccionDemanda(prediccion, fechaInicioPrediccion, articulo, cantDiasPeriodo);
+        PrediccionDemanda prediccionDemanda = crearPrediccionDemanda(prediccion, fechaInicioPrediccion, articulo, cantMesesPeriodo);
         prediccionDemandaList.add(prediccionDemanda);
 
         //Cuando hay más corridas
@@ -88,23 +89,23 @@ public class PrediccionPromedioMovil implements PrediccionDemandaStrategy {
                 prediccionExtra = sumatoria / numeroPeriodos;
                 predicciones.add(Math.round(prediccion));
 
-                PrediccionDemanda prediccionDemanda1 = crearPrediccionDemanda(prediccionExtra, fechaInicioPrediccion, articulo, cantDiasPeriodo);
+                PrediccionDemanda prediccionDemanda1 = crearPrediccionDemanda(prediccionExtra, fechaInicioPrediccion, articulo, cantMesesPeriodo);
                 prediccionDemandaList.add(prediccionDemanda1);
 
-                fechaInicioPrediccion = fechaInicioPrediccion.plusDays(cantDiasPeriodo);
+                fechaInicioPrediccion = fechaInicioPrediccion.plusMonths(cantMesesPeriodo);
             }
         }
         return prediccionDemandaList;
     }
 
-    public PrediccionDemanda crearPrediccionDemanda(int prediccion, LocalDate fechaInicioPrediccion, Articulo articulo, Long cantDiasPeriodo) {
+    public PrediccionDemanda crearPrediccionDemanda(int prediccion, LocalDate fechaInicioPrediccion, Articulo articulo, Long cantMesesPeriodo) {
         PrediccionDemanda prediccionDemanda = new PrediccionDemanda();
 
         prediccionDemanda.setPrediccion(prediccion);
         prediccionDemanda.setTipoPrediccion(TipoPrediccion.PROM_MOVIL);
         prediccionDemanda.setFechaPrediccion(LocalDate.now());
         prediccionDemanda.setFechaDesde(fechaInicioPrediccion);
-        prediccionDemanda.setFechaHasta(fechaInicioPrediccion.plusDays(cantDiasPeriodo));
+        prediccionDemanda.setFechaHasta(fechaInicioPrediccion.plusMonths(cantMesesPeriodo));
         prediccionDemanda.setArticulo(articulo);
 
         return prediccionDemanda;

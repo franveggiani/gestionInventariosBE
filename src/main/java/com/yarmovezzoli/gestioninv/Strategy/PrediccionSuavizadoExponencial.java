@@ -31,15 +31,16 @@ public class PrediccionSuavizadoExponencial implements PrediccionDemandaStrategy
         TipoPeriodo tipoPeriodo = prediccionDemandaRequest.getTipoPeriodo();
         Long idArticulo = prediccionDemandaRequest.getArticuloId();
         Long cantDiasPeriodo = tipoPeriodo.getDias();
+        Long cantMesesPeriodo = tipoPeriodo.getCantidadMeses();
         Articulo articulo = articuloRepository.findById(idArticulo).orElse(null);
         int numeroPeriodos = prediccionDemandaRequest.getNumeroPeriodos();
         float alpha = prediccionDemandaRequest.getAlpha();
 
         //Obtengo la primera prediccion
-        LocalDate fechaInicioAuxiliar = fechaInicioPrediccion.minusDays(cantDiasPeriodo); //Para calcular la prediccion del periodo anterior
+        LocalDate fechaInicioAuxiliar = fechaInicioPrediccion.minusMonths(cantMesesPeriodo); //Para calcular la prediccion del periodo anterior
 
-        LocalDate fechaInicioPeriodo = fechaInicioAuxiliar.minusDays(cantDiasPeriodo * numeroPeriodos);
-        LocalDate fechaFinPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
+        LocalDate fechaInicioPeriodo = fechaInicioAuxiliar.minusMonths(cantMesesPeriodo * numeroPeriodos);
+        LocalDate fechaFinPeriodo = fechaInicioPeriodo.plusMonths(cantMesesPeriodo);
 
         List<Integer> ventasPorPeriodo = new ArrayList<>();
 
@@ -51,8 +52,8 @@ public class PrediccionSuavizadoExponencial implements PrediccionDemandaStrategy
 
             System.out.println("periodo: " + (i + 1) + "; ventas obtenidas del periodo: " + ventasDelPeriodo + "; desde: " + fechaInicioPeriodo + "; hasta: " + fechaFinPeriodo);
 
-            fechaInicioPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
-            fechaFinPeriodo = fechaFinPeriodo.plusDays(cantDiasPeriodo);
+            fechaInicioPeriodo = fechaInicioPeriodo.plusMonths(cantMesesPeriodo);
+            fechaFinPeriodo = fechaFinPeriodo.plusMonths(cantMesesPeriodo);
         }
 
         int sumatoria = ventasPorPeriodo.stream().mapToInt(Integer::intValue).sum();
@@ -64,12 +65,12 @@ public class PrediccionSuavizadoExponencial implements PrediccionDemandaStrategy
         int X1 = Math.round(X0 + alpha*(ventasPorPeriodo.getLast() - X0));
         System.out.println("Prediccion en corrida 1: " + X1);
 
-        prediccionesObtenidas.add(crearPrediccionDemanda(X1, fechaInicioPrediccion, articulo, cantDiasPeriodo));
+        prediccionesObtenidas.add(crearPrediccionDemanda(X1, fechaInicioPrediccion, articulo, cantMesesPeriodo));
 
         if (cantidadPredicciones > 1) {
 
             fechaInicioPeriodo = fechaInicioPrediccion;
-            fechaFinPeriodo = fechaFinPeriodo.plusDays(cantDiasPeriodo);
+            fechaFinPeriodo = fechaFinPeriodo.plusMonths(cantMesesPeriodo);
 
             for (int i = 0; i < cantidadPredicciones; i++) {
                 List<Venta> ventaList = ventaRepository.findByPeriodoAndArticulo(fechaInicioPeriodo, fechaFinPeriodo, articulo);
@@ -82,26 +83,26 @@ public class PrediccionSuavizadoExponencial implements PrediccionDemandaStrategy
                     Xi = X1;
                 }
                 X1 = Math.round(Xi + alpha*(ventasDelPeriodo - Xi));
-                prediccionesObtenidas.add(crearPrediccionDemanda(X1, fechaInicioPrediccion, articulo, cantDiasPeriodo));
+                prediccionesObtenidas.add(crearPrediccionDemanda(X1, fechaInicioPrediccion, articulo, cantMesesPeriodo));
 
                 System.out.println("Prediccion en corrida " + (i+2) + ": " + X1 + "; VentasDelPeriodo: " + ventasDelPeriodo + "; PrediccionAnterior: " + X1);
 
-                fechaInicioPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
-                fechaFinPeriodo = fechaFinPeriodo.plusDays(cantDiasPeriodo);
+                fechaInicioPeriodo = fechaInicioPeriodo.plusMonths(cantMesesPeriodo);
+                fechaFinPeriodo = fechaFinPeriodo.plusMonths(cantMesesPeriodo);
             }
         }
 
         return prediccionesObtenidas;
     }
 
-    public PrediccionDemanda crearPrediccionDemanda(int prediccion, LocalDate fechaInicioPrediccion, Articulo articulo, Long cantDiasPeriodo) {
+    public PrediccionDemanda crearPrediccionDemanda(int prediccion, LocalDate fechaInicioPrediccion, Articulo articulo, Long cantMesesPeriodo) {
         PrediccionDemanda prediccionDemanda = new PrediccionDemanda();
 
         prediccionDemanda.setPrediccion(prediccion);
         prediccionDemanda.setTipoPrediccion(TipoPrediccion.PROM_MOVIL);
         prediccionDemanda.setFechaPrediccion(LocalDate.now());
         prediccionDemanda.setFechaDesde(fechaInicioPrediccion);
-        prediccionDemanda.setFechaHasta(fechaInicioPrediccion.plusDays(cantDiasPeriodo));
+        prediccionDemanda.setFechaHasta(fechaInicioPrediccion.plusMonths(cantMesesPeriodo));
         prediccionDemanda.setArticulo(articulo);
 
         return prediccionDemanda;

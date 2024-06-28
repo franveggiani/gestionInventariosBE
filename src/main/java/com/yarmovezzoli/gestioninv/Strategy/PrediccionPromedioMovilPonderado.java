@@ -30,7 +30,7 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
         LocalDate fechaInicioPrediccion = prediccionDemandaRequest.getFechaDesdePrediccion() != null ? prediccionDemandaRequest.getFechaDesdePrediccion() : LocalDate.now();
         TipoPeriodo tipoPeriodo = prediccionDemandaRequest.getTipoPeriodo();
         Long idArticulo = prediccionDemandaRequest.getArticuloId();
-        Long cantDiasPeriodo = tipoPeriodo.getDias();
+        Long cantMesesPeriodo = tipoPeriodo.getCantidadMeses();
         Articulo articulo = articuloRepository.findById(idArticulo).orElse(null);
         int numeroPeriodos = prediccionDemandaRequest.getNumeroPeriodos();
         Double[] ponderaciones = prediccionDemandaRequest.getPonderaciones();
@@ -39,8 +39,8 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
             throw new IllegalArgumentException("La cantidad de ponderaciones debe ser igual a la cantidad de periodos");
         }
 
-        LocalDate fechaInicioPeriodo = fechaInicioPrediccion.minusDays(cantDiasPeriodo*numeroPeriodos);
-        LocalDate fechaFinPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
+        LocalDate fechaInicioPeriodo = fechaInicioPrediccion.minusMonths(cantMesesPeriodo*numeroPeriodos);
+        LocalDate fechaFinPeriodo = fechaInicioPeriodo.plusMonths(cantMesesPeriodo);
 
         List<Integer> ventasPorPeriodo = new ArrayList<>();
 
@@ -55,8 +55,8 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
             System.out.println("periodo: " + (i + 1) + "; ventas obtenidas del periodo: " + sumatoria + "; desde: " + fechaInicioPeriodo + "; hasta: " + fechaFinPeriodo);
             ventasPorPeriodo.add(sumatoria);
 
-            fechaInicioPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
-            fechaFinPeriodo = fechaInicioPeriodo.plusDays(cantDiasPeriodo);
+            fechaInicioPeriodo = fechaInicioPeriodo.plusMonths(cantMesesPeriodo);
+            fechaFinPeriodo = fechaInicioPeriodo.plusMonths(cantMesesPeriodo);
         }
 
         float denominador = 0;
@@ -74,21 +74,21 @@ public class PrediccionPromedioMovilPonderado implements PrediccionDemandaStrate
 
         List<PrediccionDemanda> prediccionDemandaList = new ArrayList<>();
 
-        PrediccionDemanda prediccion = crearPrediccionDemanda(promedioPonderado, fechaInicioPrediccion, articulo, cantDiasPeriodo);
+        PrediccionDemanda prediccion = crearPrediccionDemanda(promedioPonderado, fechaInicioPrediccion, articulo, cantMesesPeriodo);
 
         prediccionDemandaList.add(prediccion);
 
         return prediccionDemandaList;
     }
 
-    public PrediccionDemanda crearPrediccionDemanda(int prediccion, LocalDate fechaInicioPrediccion, Articulo articulo, Long cantDiasPeriodo) {
+    public PrediccionDemanda crearPrediccionDemanda(int prediccion, LocalDate fechaInicioPrediccion, Articulo articulo, Long cantMesesPeriodo) {
         PrediccionDemanda prediccionDemanda = new PrediccionDemanda();
 
         prediccionDemanda.setPrediccion(prediccion);
         prediccionDemanda.setTipoPrediccion(TipoPrediccion.PROM_MOVIL_PONDERADO);
         prediccionDemanda.setFechaPrediccion(LocalDate.now());
         prediccionDemanda.setFechaDesde(fechaInicioPrediccion);
-        prediccionDemanda.setFechaHasta(fechaInicioPrediccion.plusDays(cantDiasPeriodo));
+        prediccionDemanda.setFechaHasta(fechaInicioPrediccion.plusMonths(cantMesesPeriodo));
         prediccionDemanda.setArticulo(articulo);
 
         return prediccionDemanda;
