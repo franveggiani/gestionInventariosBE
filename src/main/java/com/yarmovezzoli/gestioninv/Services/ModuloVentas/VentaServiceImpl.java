@@ -75,7 +75,6 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                             articulo.setEstadoArticulo(EstadoArticulo.NO_DISPONIBLE);
                         }
                     }
-
                 }
 
                 if (ventaRequest.getFechaHoraAlta() == null) {
@@ -110,8 +109,9 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
 
                 TipoPeriodo tipoPeriodo = demandaHistoricaRequest.getTipoPeriodo();
                 Long cantidadDias = tipoPeriodo.getDias();                                                              //Si es Semestral serán 183 días, si es Trimestral serán 91 días, y así...
+                Long cantidadMeses = tipoPeriodo.getCantidadMeses();
 
-                LocalDate fechaHasta = demandaHistoricaRequest.getFechaDesde().plusDays(cantidadDias);
+                LocalDate fechaHasta = demandaHistoricaRequest.getFechaDesde().plusMonths(cantidadMeses);
                 LocalDate fechaDesde = demandaHistoricaRequest.getFechaDesde();
 
                 List<Venta> ventaList = ventaRepository.findByPeriodoAndArticulo(fechaDesde, fechaHasta ,articulo);
@@ -238,6 +238,25 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 float errorPM = sumatoriaPM / 6;
                 float errorPMP = sumatoriaPMP / 6;
                 float errorSE = sumatoriaSE / 6;
+
+                List<Float> errores = new ArrayList<>();
+                errores.add(errorPM);
+                errores.add(errorPMP);
+                errores.add(errorSE);
+
+                float errorMinimo = errores.stream().min(Float::compareTo).get();
+
+                if (errorMinimo == errorPM) {
+                    articulo.setTipoPrediccion(TipoPrediccion.PROM_MOVIL);
+                } else if (errorMinimo == errorPMP) {
+                    articulo.setTipoPrediccion(TipoPrediccion.PROM_MOVIL_PONDERADO);
+                } else if (errorMinimo == errorSE) {
+                    articulo.setTipoPrediccion(TipoPrediccion.EXPONENCIAL);
+                }
+
+                System.out.println("Error Minimo: " + errorMinimo + " Tipo prediccion elegido: " + articulo.getTipoPrediccion());
+
+                articuloRepository.save(articulo);
 
                 List<ErrorDTO> errorDTOList = new ArrayList<>();
 

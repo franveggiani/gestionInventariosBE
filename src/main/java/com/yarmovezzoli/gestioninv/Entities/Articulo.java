@@ -2,6 +2,7 @@ package com.yarmovezzoli.gestioninv.Entities;
 
 import com.yarmovezzoli.gestioninv.Enums.EstadoArticulo;
 import com.yarmovezzoli.gestioninv.Enums.ModeloInventario;
+import com.yarmovezzoli.gestioninv.Enums.TipoPrediccion;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,11 +29,14 @@ public class Articulo extends Base{
     @Column(name = "stock_seguridad")
     private int stockSeguridad;
 
-    @Column(name = "puntoPedido")
+    @Column(name = "punto_pedido")
     private int puntoPedido;
 
     @Column(name = "stock_actual")
     private int stockActual;
+
+    @Column(name = "tipo_prediccion")
+    private TipoPrediccion tipoPrediccion;
 
     @JoinColumn(name = "estado_articulo")
     private EstadoArticulo estadoArticulo;
