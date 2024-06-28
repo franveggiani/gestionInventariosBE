@@ -27,4 +27,7 @@ public class ProveedorxArticuloDTO {
     Long idArticulo;
     Long idProveedor;
     boolean esPredeterminado;
+    int q;
+    int PP;
+    int stockSeguridad;
 }
