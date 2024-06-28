@@ -239,6 +239,25 @@ public class VentaServiceImpl extends BaseServiceImpl<Venta, Long> implements Ve
                 float errorPMP = sumatoriaPMP / 6;
                 float errorSE = sumatoriaSE / 6;
 
+                List<Float> errores = new ArrayList<>();
+                errores.add(errorPM);
+                errores.add(errorPMP);
+                errores.add(errorSE);
+
+                float errorMinimo = errores.stream().min(Float::compareTo).get();
+
+                if (errorMinimo == errorPM) {
+                    articulo.setTipoPrediccion(TipoPrediccion.PROM_MOVIL);
+                } else if (errorMinimo == errorPMP) {
+                    articulo.setTipoPrediccion(TipoPrediccion.PROM_MOVIL_PONDERADO);
+                } else if (errorMinimo == errorSE) {
+                    articulo.setTipoPrediccion(TipoPrediccion.EXPONENCIAL);
+                }
+
+                System.out.println("Error Minimo: " + errorMinimo + " Tipo prediccion elegido: " + articulo.getTipoPrediccion());
+
+                articuloRepository.save(articulo);
+
                 List<ErrorDTO> errorDTOList = new ArrayList<>();
 
                 ErrorDTO errorDTOPM = new ErrorDTO();
