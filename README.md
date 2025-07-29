@@ -3,176 +3,111 @@
 ```txt
 ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
 █                                       █
-█  🛠  GESTIÓN DE INVENTARIOS - BACKEND  █
-█  ✨  Diseño Profesional & Buenas Prácticas  █
-█  🚀  Spring Boot | JPA | REST API      █
+█  🏭 GESTIÓN DE INVENTARIOS - BACKEND   █
+█  🔥 Patrones de Diseño & Spring Boot   █
+█  🚀 Java 17 | JPA | REST API | H2      █
 █                                       █
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-
 ```
 
-## 🌟 Características Destacadas
+## Características Destacadas
 
-```diff
-+ ARQUITECTURA LIMPIA Y MODULAR
-+ IMPLEMENTACIÓN DE MEJORES PRÁCTICAS
-+ MANEJO DE EXCEPCIONES CENTRALIZADO
+```
++ ARQUITECTURA POR CAPAS CON PATRONES DE DISEÑO
++ STRATEGY PARA MOVIMIENTOS DE INVENTARIO
++ FACTORY PARA CREACIÓN DE OBJETOS
++ DTOs PARA TRANSFERENCIA SEGURA
++ ENUMS PARA TIPOS ESTÁTICOS
 + VALIDACIONES ROBUSTAS
-+ DTOs PARA TRANSFERENCIA SEGURA DE DATOS
-+ DOCUMENTACIÓN INTERNA
 ```
 
 ---
 
-## 📂 Estructura del Proyecto (Arquitectura por Capas)
-
+## 📂 Estructura del Proyecto
 ```
-src/
-├── main/
-│   ├── java/
-│   │   └── com/
-│   │       └── gestionInventarios/
-│   │           ├── controller/        👉 Capa de controladores REST
-│   │           ├── dto/               👉 Objetos de Transferencia de Datos (DTOs)
-│   │           ├── entity/            👉 Entidades de persistencia (JPA)
-│   │           ├── repository/        👉 Repositorios (Spring Data JPA)
-│   │           ├── service/           👉 Lógica de negocio
-│   │           │   └── impl/          👉 Implementaciones de servicios
-│   │           └── util/              👉 Utilidades globales
-│   └── resources/
-│       ├── import.sql                 👉 Datos iniciales para pruebas
-│       └── application.properties     👉 Configuración
+src/main/java/com/gestionInventarios/
+├── controller/           👉 Controladores REST (Manejo de peticiones HTTP)
+├── DTOs/                 👉 Objetos de Transferencia de Datos (Seguridad)
+├── entities/             👉 Entidades de Persistencia (Mapeo JPA)
+├── enums/                👉 Tipos Enumerados (Estados y Tipos)
+├── factory/              👉 Patrón Factory (Creación de objetos)
+├── repositories/         👉 Acceso a Datos (Spring Data JPA)
+├── services/             👉 Lógica de Negocio (Implementaciones)
+├── strategy/             👉 Patrón Strategy (Movimientos de inventario)
+└── GestioninvApplication.java 👉 Punto de inicio de la aplicación
 ```
 
 ---
 
-## 🏆 Buenas Prácticas Implementadas
+## 🏆 Patrones de Diseño Implementados
 
-### 1. Patrón DTO (Data Transfer Object)
-- **Beneficio**: Evita exponer la estructura interna de las entidades
-- **Ejemplo**: `ProductoDto` para transferencia segura de datos
+1. Patrón Strategy (Movimientos de Inventario)
+2. Patrón Factory (Creación de Movimientos)
+3. Patrón DTO (Data Transfer Object) para no exponer entidades
+4. Uso de Enums para Tipos Estáticos
 
-### 2. Validación de Entradas
+---
+
+## 🛡️ Buenas Prácticas
+
+### 1. Separación Clara de Responsabilidades
+- **Controllers**: Manejo de requests/responses
+- **Services**: Lógica de negocio (con Strategy y Factory)
+- **Repositories**: Acceso a datos
+
+### 2. Uso de DTOs
 ```java
-@PostMapping
-public ResponseEntity<?> crearProducto(
-    @Valid @RequestBody ProductoDto productoDto) { ... }
-```
-- Uso de anotaciones `@Valid` y `@NotNull` en DTOs
-
-### 3. Manejo Centralizado de Excepciones
-```java
-@ControllerAdvice
-public class GlobalExceptionHandler {
-    @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<?> handleResourceNotFound(...) { ... }
+// En DTOs/
+public class ProductoDTO {
+    private String nombre;
+    private BigDecimal precio;
+    // ... 
 }
 ```
+- **Beneficio**: Evita exposición directa de entidades
 
-### 4. Separación Clara de Responsabilidades
-- Controllers → Manejo de requests/responses
-- Services → Lógica de negocio
-- Repositories → Acceso a datos
-
-### 5. Transacciones
-```java
-@Transactional
-public void realizarEntradaInventario(...) { ... }
-```
-
-### 6. Uso de Lombok
-- Reduce código boilerplate con `@Data`, `@NoArgsConstructor`, etc.
+### 3. Documentación Interna
+- Código bien comentado explicando patrones y lógica
 
 ---
 
-## 🔧 Tecnologías Utilizadas
+## 🔧 Stack Tecnológico
 
 ```
 - Java 17
 - Spring Boot 3.x
 - Spring Data JPA (Hibernate)
-- H2 Database (para desarrollo)
-- Lombok
-- Maven
-- Jakarta Validation
+- H2 Database (embebida)
+- Lombok (reducción de boilerplate)
+- Maven (gestión de dependencias)
+- Jakarta Bean Validation
 ```
 
 ---
 
-## 🚀 Cómo Ejecutar
+## 🚀 Instalación y Ejecución
 
 1. Clonar repositorio:
 ```bash
 git clone https://github.com/franveggiani/gestionInventariosBE.git
 ```
 
-2. Ejecutar con Maven:
+2. Ejecutar la aplicación:
 ```bash
 mvn spring-boot:run
 ```
 
-3. Acceder a la consola H2 (desarrollo):
+3. Acceder a consola H2 (credenciales en application.properties):
 ```
 http://localhost:8080/h2-console
-JDBC URL: jdbc:h2:mem:testdb
-User: sa
-Password: [vacío]
 ```
-
----
-
-## 📚 Documentación de Endpoints
-
-### Productos
-- `GET /api/productos` → Listar todos los productos
-- `GET /api/productos/{id}` → Obtener producto por ID
-- `POST /api/productos` → Crear nuevo producto
-- `PUT /api/productos/{id}` → Actualizar producto
-- `DELETE /api/productos/{id}` → Eliminar producto
-
-### Movimientos de Inventario
-- `POST /api/movimientos/entrada` → Registrar entrada de stock
-- `POST /api/movimientos/salida` → Registrar salida de stock
-
----
-
-## Ejemplo de Código (Manejo Elegante de Excepciones)
-
-```java
-@ExceptionHandler(MethodArgumentNotValidException.class)
-public ResponseEntity<Map<String, String>> handleValidationExceptions(
-    MethodArgumentNotValidException ex) {
-    
-    Map<String, String> errors = new HashMap<>();
-    ex.getBindingResult().getAllErrors().forEach(error -> {
-        String fieldName = ((FieldError) error).getField();
-        String errorMessage = error.getDefaultMessage();
-        errors.put(fieldName, errorMessage);
-    });
-    return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-}
-```
-
----
-
-## 🤝 Contribuir
-
-¡Se aceptan contribuciones! Por favor:
-1. Haz un fork del proyecto
-2. Crea una rama (`git checkout -b feature/nueva-funcionalidad`)
-3. Realiza tus cambios
-4. Haz push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
 
 ---
 
 ## 📄 Licencia
-Este proyecto está bajo la [Licencia MIT](LICENSE).
+MIT License - Ver [LICENSE](LICENSE) para más detalles.
 
 ---
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-```
 
-> **Nota**: Este README destaca las mejores prácticas y arquitectura limpia del proyecto.  
-> Para detalles técnicos completos, revisa el código fuente ✨
-```
+> **Nota**: Este proyecto implementa patrones de diseño avanzados para  
+> una solución escalable de gestión de inventarios. ¡Revise el código!
