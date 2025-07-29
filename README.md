@@ -136,7 +136,7 @@ Password: [vacío]
 
 ---
 
-## 🌈 Ejemplo de Código (Manejo Elegante de Excepciones)
+## Ejemplo de Código (Manejo Elegante de Excepciones)
 
 ```java
 @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -170,14 +170,7 @@ public ResponseEntity<Map<String, String>> handleValidationExceptions(
 Este proyecto está bajo la [Licencia MIT](LICENSE).
 
 ---
-
-```txt
-▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄
-█                                       █
-█  Desarrollado con ❤️ por @franveggiani  █
-█  ¡Gracias por usar este proyecto!     █
-█                                       █
-▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 ```
 
 > **Nota**: Este README destaca las mejores prácticas y arquitectura limpia del proyecto.  
