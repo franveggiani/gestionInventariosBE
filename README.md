@@ -104,10 +104,3 @@ http://localhost:8080/h2-console
 
 ---
 
-## 📄 Licencia
-MIT License - Ver [LICENSE](LICENSE) para más detalles.
-
----
-
-> **Nota**: Este proyecto implementa patrones de diseño avanzados para  
-> una solución escalable de gestión de inventarios. ¡Revise el código!
